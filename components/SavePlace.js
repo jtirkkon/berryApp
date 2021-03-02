@@ -3,10 +3,13 @@ import React, {useState} from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
+import * as SQLite from 'expo-sqlite';
 
 import { Icon } from'react-native-elements';
 
 //Tähän vielä paikannimi
+//Tietokanta
+//Ikkuna, jos valitsee muun
 
 function SavePlace ({navigation, route}) {
   const {position} = route.params;
@@ -21,6 +24,23 @@ function SavePlace ({navigation, route}) {
   const [placeName, setPlacename] = useState('');
   const [litres, setLitres] = useState('');
   const [memo, setMemo] = useState('');
+
+  useEffect(() => {
+    db.transaction(tx => {
+      tx.executeSql('create table if not exists berryTest (id integer primary key not null, selectedBerry text, place text, litres real, latitude text, longitude text, time text, memo text);');
+    });
+    updateList();    
+  }, []);
+
+  /*const savePlace = () => {
+    db.transaction(tx => {
+        tx.executeSql('insert into berryTest (berry, place, litres, position, time, memo) values (?, ?, ?, ?, ?, ? ?, ?);', [selectedBerry, placeName, litres, latitude, longitude, time, memo]);    
+      }, null, updateList
+    );
+    setPlaceName('');
+    setLitres('');
+    setMemo('');
+  }*/
   //onValueChange={(itemValue, itemIndex) => setSelectedBerry(itemValue)}
 
   /*handlePickerChange = (itemValue, itemIndex) => {
