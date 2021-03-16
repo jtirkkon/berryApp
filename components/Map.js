@@ -12,6 +12,7 @@ import{ Icon } from'react-native-elements';
 
 
 //Katotaan myöhemmin, jos löydetään parempi ratkaisu
+
 //Tällä kai pitäis saada enemmänkin markkereita.
 /*{this.state.markers.map((marker, index) => (
   <Marker
@@ -62,21 +63,33 @@ import{ Icon } from'react-native-elements';
 function Map ({navigation, route}) {
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
   const [positionMarker, setPositionMarker] = useState({latitude: 0, longitude: 0});
-  const [placeMarker, setPlaceMarker] = useState({latitude: 100, longitude: 200, berry: '', placeName: '', time: ''})
+  const [placeMarker, setPlaceMarker] = useState({latitude: 100, longitude: 200, berry: '', placeName: '', time: ''});
+  const [testMarkers, setTestMarkers] = useState([{position: {latitude: 100, longitude: 200}, berry: '', placeName: ''}]);
+  
+
+  /*{latitude: 63.08550590078892, longitude: 21.66948688445667, berry: 'blueberry', placeName: 'ström', time: '2.7.2020'},
+  {latitude: 63.08300590078892, longitude: 21.69348688445667, berry: 'lingonberry', placeName: 'ström2', time: '5.7.2018'},
+  {latitude: 63.07300590078892, longitude: 21.69548688445667, berry: 'lingonberry', placeName: 'ström3', time: '5.7.2016'},]);*/
   
   
   
+  //Joku eri ehto, kun tulee useita markkereita
   if (route.params) {
+    console.log("params in map", route.params);
     if (route.params.placePermission) {
-      const placePosition = route.params.placePosition;
+      //Testimarkkereihin tiedot
+      setTestMarkers(route.params.selectedBerryPlaces);
+      console.log("ei tule", testMarkers);
+      /*const placePosition = route.params.placePosition;
       const berry = route.params.berry;
       const placeName = route.params.placeName;
-      const time = route.params.time;
+      const time = route.params.time;*/
       //console.log(placePosition);
       //console.log("if", route.params.placePosition.latitude);
       //setPlacePosition({latitude: route.params.placePosition.latitude, longitude: route.params.placePosition.longitude});
-      setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
-      setPlaceMarker({latitude: placePosition.latitude, longitude: placePosition.longitude, berry: berry, placeName: placeName, time: time});
+      
+      /*setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
+      setPlaceMarker({latitude: placePosition.latitude, longitude: placePosition.longitude, berry: berry, placeName: placeName, time: time});*/
       route.params.placePermission = false;
     }
   }
@@ -139,8 +152,19 @@ function Map ({navigation, route}) {
           }}
           title={`${placeMarker.berry}`}
           description={`${placeMarker.placeName}, ${placeMarker.time}`}
-          
-        />    
+        />
+        {testMarkers.map((marker, index) => (
+          <Marker
+          key={index}
+          coordinate={{
+            latitude: marker.position.latitude,
+            longitude: marker.position.longitude
+          }}
+          title={marker.berry}
+          description={marker.placeName}
+          />
+          ))}
+
       </MapView>
       <View style={{position: 'absolute', alignSelf: 'flex-end', justifyContent: 'flex-end'}}>
         <Icon reverse name='locate-outline' type='ionicon' color='#0000FF' onPress={getLocation}/>
@@ -149,6 +173,8 @@ function Map ({navigation, route}) {
     </View>
   );          
 }
+
+/*
 
 /*onPress={() =>
   Alert.alert(

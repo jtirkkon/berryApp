@@ -7,10 +7,13 @@ import SavePlace from './components/SavePlace';
 import BerryPlaces from './components/BerryPlaces';
 //import MyPlaces from './components/MyPlaces'
 //Todo:
-
-//1. Näyttää kaikki tiedot, kun longpress itemiä.
+//Ekana: Näyttäminen kartalla, kun klikkaa vain yhtä
+//Vaihdetaanko kysymysmerkki isompaan?
+//Memo jää piiloon
+//Kysyttävä other-valintaa.
+//Ei näytä vielä tietoja.
 //2. Tietokanta kuntoon
-//3. Voi valita useita kohteita, jotka näytetään kartalla
+//3. Voi valita useita kohteita, jotka näytetään kartalla, tämä
 
 const Stack = createStackNavigator();
 
