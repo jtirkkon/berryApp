@@ -79,19 +79,20 @@ function Map ({navigation, route}) {
     if (route.params.placePermission) {
       //Testimarkkereihin tiedot
       setTestMarkers(route.params.selectedBerryPlaces);
-      console.log("ei tule", testMarkers);
-      /*const placePosition = route.params.placePosition;
-      const berry = route.params.berry;
+      console.log("testmarkers", testMarkers);
+      const placePosition = route.params.selectedBerryPlaces[0].position;
+      /*const berry = route.params.berry;
       const placeName = route.params.placeName;
       const time = route.params.time;*/
       //console.log(placePosition);
       //console.log("if", route.params.placePosition.latitude);
       //setPlacePosition({latitude: route.params.placePosition.latitude, longitude: route.params.placePosition.longitude});
       
-      /*setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
-      setPlaceMarker({latitude: placePosition.latitude, longitude: placePosition.longitude, berry: berry, placeName: placeName, time: time});*/
+      setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
+      /*setPlaceMarker({latitude: placePosition.latitude, longitude: placePosition.longitude, berry: berry, placeName: placeName, time: time});*/
       route.params.placePermission = false;
     }
+    
   }
   
   
@@ -145,14 +146,7 @@ function Map ({navigation, route}) {
             title='You are here'
             
         />
-        <Marker
-          coordinate={{
-            latitude: placeMarker.latitude,
-            longitude: placeMarker.longitude
-          }}
-          title={`${placeMarker.berry}`}
-          description={`${placeMarker.placeName}, ${placeMarker.time}`}
-        />
+        
         {testMarkers.map((marker, index) => (
           <Marker
           key={index}
@@ -161,7 +155,7 @@ function Map ({navigation, route}) {
             longitude: marker.position.longitude
           }}
           title={marker.berry}
-          description={marker.placeName}
+          description={`${marker.placeName}, ${marker.time}`}
           />
           ))}
 
@@ -175,6 +169,15 @@ function Map ({navigation, route}) {
 }
 
 /*
+
+<Marker
+          coordinate={{
+            latitude: placeMarker.latitude,
+            longitude: placeMarker.longitude
+          }}
+          title={`${placeMarker.berry}`}
+          description={`${placeMarker.placeName}, ${placeMarker.time}`}
+        />
 
 /*onPress={() =>
   Alert.alert(

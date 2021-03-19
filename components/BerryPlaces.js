@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { Header, Text, ListItem, Overlay } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
+import * as firebase from 'firebase';
 
 //lyhyt painallus -> näyttää kartalla, pitkä painallus -> näyttää tarkemmat tiedot
 //<ListItem bottomDivider onPress={() => navigation.navigate('Map', {addressToShow: item})}  onLongPress={() => deleteAddress(index)}></ListItem>
@@ -26,9 +27,62 @@ function BerryPlaces ({navigation}) {
   const [locationIcon, setLocationIcon] = useState('black');
   //State tänne, johon talletetaan useat paikat.
 
-  useEffect(() =>{
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
+    authDomain: "berryapp-e2c7e.firebaseapp.com",
+    databaseURL: "https://berryapp-e2c7e-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "berryapp-e2c7e",
+    storageBucket: "berryapp-e2c7e.appspot.com",
+    messagingSenderId: "3982672749",
+    appId: "1:3982672749:web:74a9232db469ea2ab61064",
+    measurementId: "G-HW99C0YXLW"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+   } else {
+    firebase.app(); // if already initialized, use that one
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  /*const getProducts = () => {
+    firebase.database().ref('items/').on('value', snapshot => {
+      const data = snapshot.val();
+      const productArray = [];
+      if (data) {
+        const tempArray = Object.entries(data);
+        //Get amount, product and firebase-id from data
+        for (let i = 0; i < tempArray.length; i++) {
+          productArray.push({amount: tempArray[i][1].amount,  product: tempArray[i][1].product, id: tempArray[i][0]});
+        }
+      }
+      setShoppingList(productArray);
+    });
+  }*/
+
+  const getData = () => {
+    firebase.database().ref('data/').on('value', snapshot => {
+      const data = snapshot.val();
+      console.log(data);
+      //Tiedot ja id pitäis nyt saada
+      //const productArray = [];
+      /*if (data) {
+        const tempArray = Object.entries(data);
+        //Get amount, product and firebase-id from data
+        for (let i = 0; i < tempArray.length; i++) {
+          productArray.push({amount: tempArray[i][1].amount,  product: tempArray[i][1].product, id: tempArray[i][0]});
+        }
+      }
+      setShoppingList(productArray);*/
+    });  
+  }
+
+  /*useEffect(() =>{
     // Do something here
-    }, [placeList]);
+    }, [placeList]);*/
 
   /*const newList = list.map((item) => {
     if (item.id === id) {
@@ -77,7 +131,8 @@ const selectBerryPlace = (index) => {
   //setLocationIcon('red');
   //tempArr = [];
   //Tämä tulostus? Vaihtaa nyt truet.
-  console.log("placeList", placeList);
+  
+  //console.log("placeList", placeList);
   
 }
 
@@ -95,7 +150,7 @@ const selectBerryPlace = (index) => {
    
   renderItem = ({ item, index }) => (
     <ListItem bottomDivider onPress={() => 
-    navigation.navigate('Map', {selectedBerryPlaces: placeList, placePermission: true})}
+    navigation.navigate('Map', {selectedBerryPlaces: [item], placePermission: true})}
     onLongPress={() => selectBerryPlace(index)} >
       <ListItem.Content>
         <ListItem.Title >{item.berry}, {item.placeName}</ListItem.Title>

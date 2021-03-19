@@ -7,17 +7,17 @@ import SavePlace from './components/SavePlace';
 import BerryPlaces from './components/BerryPlaces';
 //import MyPlaces from './components/MyPlaces'
 //Todo:
-//Ekana: Näyttäminen kartalla, kun klikkaa vain yhtä
+
 //Vaihdetaanko kysymysmerkki isompaan?
 //Memo jää piiloon
 //Kysyttävä other-valintaa.
-//Ei näytä vielä tietoja.
-//2. Tietokanta kuntoon
-//3. Voi valita useita kohteita, jotka näytetään kartalla, tämä
+//1. Tietokanta kuntoon
+//tallennus ja Kaikki tallennetut paikat, komponentit
+
 
 const Stack = createStackNavigator();
 
-//tallennus ja Kaikki tallennetut paikat, komponentit
+
 
 export default function App() {
   return (
