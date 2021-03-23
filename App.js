@@ -5,13 +5,9 @@ import Home from './components/Home';
 import Map from './components/Map';
 import SavePlace from './components/SavePlace';
 import BerryPlaces from './components/BerryPlaces';
+import Help from './components/Help';
 //import MyPlaces from './components/MyPlaces'
-//Todo:
-
-//Vaihdetaanko kysymysmerkki isompaan?
-//Memo jää piiloon
-//Kysyttävä other-valintaa.
-//1. Tietokanta kuntoon
+//Todo: Seuraavaksi Help valmiiksi
 //tallennus ja Kaikki tallennetut paikat, komponentit
 
 
@@ -26,6 +22,7 @@ export default function App() {
         <Stack.Screen name="Map" component={Map} />
         <Stack.Screen name="Save new place" component={SavePlace} />
         <Stack.Screen name="Berry places" component={BerryPlaces} />
+        <Stack.Screen name="Help" component={Help} />
       </Stack.Navigator>
     </NavigationContainer>
   );

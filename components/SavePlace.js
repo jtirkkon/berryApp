@@ -1,29 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, Alert, ScrollView, Modal } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as firebase from 'firebase';
-//import * as SQLite from 'expo-sqlite';
 
 import { Icon } from'react-native-elements';
 
 //Nyt oma tietokanta testataan sen toiminta. Ensin tallennus
 //Tietokantaan tallennus:
+//Unmounted component: tulee vain silloin tällöin. Suosikeissa on yksi sivu tallennettuna.
+//Settin timer?
 
 //1. Tietokannasta pitäisi nyt koittaa lukea tiedot!
-//Ikkuna, jos valitsee muun
-//Keyboard aware scrollview, memo jää keypadin alle
-//Keyboard avoidin view
-//Kokeillaan tätä esimerkkiä toisessa koodissa
-//https://docs.expo.io/versions/latest/react-native/keyboardavoidingview/
+//Ikkuna, jos valitsee muun, tämä seuraavaksi. Jatketaan tätä kuntoon! Ei kunnolla toimi.
 
 function SavePlace ({navigation, route}) {
-  const [selectedBerry, setSelectedBerry] = useState('Blueberry');
+  const [selectedBerry, setSelectedBerry] = useState('');
   const [placeName, setPlaceName] = useState('');
   const [litres, setLitres] = useState('');
   const [memo, setMemo] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [otherSelection, setOtherSelection] = useState('Other');
 
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
@@ -37,17 +35,6 @@ function SavePlace ({navigation, route}) {
     measurementId: "G-HW99C0YXLW"
   };
   
-  /*const firebaseConfig = {
-    apiKey: "AIzaSyCscPrioYRsFHTx6MIXjbuMaf0ngxgpUQg",
-    authDomain: "shoppinglist-12009.firebaseapp.com",
-    databaseURL: "https://shoppinglist-12009-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "shoppinglist-12009",
-    storageBucket: "shoppinglist-12009.appspot.com",
-    messagingSenderId: "246131758389",
-    appId: "1:246131758389:web:22fbe828207e1a299ca87c",
-    measurementId: "G-0R5CT305MN"
-  };*/
-
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
    } else {
@@ -56,23 +43,54 @@ function SavePlace ({navigation, route}) {
   
   const {position} = route.params;
   console.log(position);
+  //Pitäiskö position tallettaa stateen?
+  //Vai tuleeko memoryleak siitä, jos valitse mitään marjaa?
   
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
   console.log(time);
-  
-
-  
-
   
   const savePlace = () => {
     console.log("testFB");
     firebase.database().ref('data/').push(
         {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': time, 'memo': memo}
       );
-      
+
+    Alert.alert(
+      'Data saved',
+      '',
+      [
+        { 
+          text: "OK", onPress: () => {} 
+        }
+      ]
+    );    
   }
-  
+
+  const handlePickerValueChange = (value, index) => {
+    console.log("handle", value);
+    console.log("index", index);
+    if (index === 7) {
+      console.log("other");
+      setOtherSelection('');
+      setModalVisible(true);
+    } else {
+      setOtherSelection('Other');
+      setSelectedBerry(value);
+    }
+  }
+
+  const handleOtherSelection = () => {
+    setSelectedBerry(otherSelection);
+    setModalVisible(false);
+  }
+
+  /*<Picker
+          selectedValue={selectedBerry}
+          style={{ height: 50, width: 250, marginTop: 20, marginBottom: 20 }}
+          onValueChange={(itemValue, itemIndex) => setSelectedBerry(itemValue)}
+        ></Picker>*/
+
   return (
     <View style={styles.container}>
       <Header
@@ -81,32 +99,43 @@ function SavePlace ({navigation, route}) {
         rightComponent = {{icon:'help', color:'#fff'}}
       />
       
-      <Picker
-        selectedValue={selectedBerry}
-        style={{ height: 50, width: 250, marginTop: 20, marginBottom: 20 }}
-        onValueChange={(itemValue, itemIndex) => setSelectedBerry(itemValue)}
-      >
-        <Picker.Item label="Select berry" value="" />
-        <Picker.Item label="Blueberry (mustikka)" value="blueberry" />
-        <Picker.Item label="Lingonberry (puolukka)" value="lingonberry" />
-        <Picker.Item label="Cloudberry (lakka)" value="cloudberry" />
-        <Picker.Item label="Raspberry (vadelma)" value="raspberry" />
-        <Picker.Item label="Cranberry (karpalo)" value="cranberry" />
-        <Picker.Item label="Sea-buckthorn (tyrni)" value="sea-buckthorn" />
-        <Picker.Item label="Other" value="other" />
-      </Picker>
-      <KeyboardAvoidingView
-  
-      behavior="positon"
-      enabled>
-       
-      <Input label = 'Place name' onChangeText={text => setPlaceName(text)} value={placeName}/>
-      <Input label = 'Litres' keyboardType = 'number-pad' onChangeText={text => setLitres(text)} value={litres}/>
-      
-      <Input label = 'Memo' multiline onChangeText={text => setMemo(text)} value={memo}/>
-      
-      <Button icon={{name: 'save'}} title='SAVE' buttonStyle={{width: 250, alignSelf: 'center' }} onPress={savePlace}></Button>
-      </KeyboardAvoidingView> 
+      <ScrollView>
+        <Picker
+          selectedValue={selectedBerry}
+          style={{ height: 50, width: 250, marginTop: 20, marginBottom: 20 }}
+          onValueChange={handlePickerValueChange}
+        >
+          <Picker.Item label="Select berry" value="" />
+          <Picker.Item label="Blueberry (mustikka)" value="blueberry" />
+          <Picker.Item label="Lingonberry (puolukka)" value="lingonberry" />
+          <Picker.Item label="Cloudberry (lakka)" value="cloudberry" />
+          <Picker.Item label="Raspberry (vadelma)" value="raspberry" />
+          <Picker.Item label="Cranberry (karpalo)" value="cranberry" />
+          <Picker.Item label="Sea-buckthorn (tyrni)" value="sea-buckthorn" />
+          <Picker.Item label={otherSelection} value={otherSelection} />
+        </Picker>
+        
+        <Input label = 'Place name' onChangeText={text => setPlaceName(text)} value={placeName}/>
+        <Input label = 'Litres' keyboardType = 'number-pad' onChangeText={text => setLitres(text)} value={litres}/>
+        <Input label = 'Memo' multiline onChangeText={text => setMemo(text)} value={memo}/>
+        <Button icon={{name: 'save'}} title='SAVE' buttonStyle={{width: 250, alignSelf: 'center' }} onPress={savePlace}></Button>
+      </ScrollView>
+        
+        <Modal visible={isModalVisible}>
+          <View style={styles.viewWrapper}>
+            <View style={styles.modalStyle}>
+              <Input label = 'Other berry etc.' onChangeText={text => setOtherSelection(text)} value={otherSelection}/>
+              <View style={{flexDirection: 'row'}}>
+                <Button icon={{name: 'cancel'}} title='CANCEL' buttonStyle={{width: 120, marginRight: 30}} 
+                  onPress={() => {setModalVisible(false); setOtherSelection('Other')}}>
+                </Button>
+                <Button icon={{name: 'save'}} title='OK' buttonStyle={{width: 120}} 
+                  onPress={handleOtherSelection}>
+                </Button>
+              </View>
+            </View>
+          </View>
+        </Modal>
       <StatusBar style="auto" />
     </View>
   );
@@ -120,6 +149,21 @@ const styles = StyleSheet.create({
     //alignItems: 'center', 
     //paddingTop: 30
   },
+  viewWrapper: { 
+    flex: 1, 
+    alignItems: "center", 
+    justifyContent: "center", 
+    backgroundColor: "rgba(0, 0, 0, 0.2)", 
+}, 
+  modalStyle: {
+    alignItems: "center", 
+    justifyContent: "center", 
+    //position: "absolute", 
+    height: 250, 
+    width: 300, 
+    backgroundColor: "#fff", 
+    borderRadius: 7, 
+  }
 });
 
 /*container: {
@@ -132,27 +176,91 @@ const styles = StyleSheet.create({
 
 export default SavePlace;
 
-//Sqlite
-/*useEffect(() => {
-    db.transaction(tx => {
-      tx.executeSql('create table if not exists berryTest (id integer primary key not null, selectedBerry text, place text, litres real, latitude text, longitude text, time text, memo text);');
-    });
-    updateList();    
-  }, []);*/
 
-  /*const savePlace = () => {
-    db.transaction(tx => {
-        tx.executeSql('insert into berryTest (berry, place, litres, position, time, memo) values (?, ?, ?, ?, ?, ? ?, ?);', [selectedBerry, placeName, litres, latitude, longitude, time, memo]);    
-      }, null, updateList
-    );
-    setPlaceName('');
-    setLitres('');
-    setMemo('');
-  }*/
-  //onValueChange={(itemValue, itemIndex) => setSelectedBerry(itemValue)}
-
-  /*handlePickerChange = (itemValue, itemIndex) => {
-    if (itemValue != '') {
-    setSelectedBerry(itemValue);
-    }
-  }*/
+/*Modal esimerkki inputilla
+import { StatusBar } from "expo-status-bar"; 
+import React, { useState } from "react"; 
+import { Button, SafeAreaView, StyleSheet, Modal,  
+         View, TextInput, Dimensions } from "react-native"; 
+  
+const { width } = Dimensions.get("window"); 
+  
+export default function App() { 
+    
+    // This is to manage Modal State 
+    const [isModalVisible, setModalVisible] = useState(false); 
+  
+    // This is to manage TextInput State 
+    const [inputValue, setInputValue] = useState(""); 
+  
+    // Create toggleModalVisibility function that will 
+    // Open and close modal upon button clicks. 
+    const toggleModalVisibility = () => { 
+        setModalVisible(!isModalVisible); 
+    }; 
+  
+    return ( 
+        <SafeAreaView style={styles.screen}> 
+            <StatusBar style="auto" /> 
+  
+            {/**  We are going to create a Modal with Text Input. } 
+            <Button title="Show Modal" onPress={toggleModalVisibility} /> 
+  
+            {/** This is our modal component containing textinput and a button } 
+            /*<Modal animationType="slide" 
+                   transparent visible={isModalVisible}  
+                   presentationStyle="overFullScreen" 
+                   onDismiss={toggleModalVisibility}> 
+                <View style={styles.viewWrapper}> 
+                    <View style={styles.modalView}> 
+                        <TextInput placeholder="Enter something..." 
+                                   value={inputValue} style={styles.textInput}  
+                                   onChangeText={(value) => setInputValue(value)} /> 
+  
+                        {This button is responsible to close the modal } 
+                        <Button title="Close" onPress={toggleModalVisibility} /> 
+                    </View> 
+                </View> 
+            </Modal> 
+        </SafeAreaView> 
+    ); 
+} */
+  
+// These are user defined styles 
+/*const styles = StyleSheet.create({ 
+    screen: { 
+        flex: 1, 
+        alignItems: "center", 
+        justifyContent: "center", 
+        backgroundColor: "#fff", 
+    }, 
+    viewWrapper: { 
+        flex: 1, 
+        alignItems: "center", 
+        justifyContent: "center", 
+        backgroundColor: "rgba(0, 0, 0, 0.2)", 
+    }, 
+    modalView: { 
+        alignItems: "center", 
+        justifyContent: "center", 
+        position: "absolute", 
+        top: "50%", 
+        left: "50%", 
+        elevation: 5, 
+        transform: [{ translateX: -(width * 0.4) },  
+                    { translateY: -90 }], 
+        height: 180, 
+        width: width * 0.8, 
+        backgroundColor: "#fff", 
+        borderRadius: 7, 
+    }, 
+    textInput: { 
+        width: "80%", 
+        borderRadius: 5, 
+        paddingVertical: 8, 
+        paddingHorizontal: 16, 
+        borderColor: "rgba(0, 0, 0, 0.2)", 
+        borderWidth: 1, 
+        marginBottom: 8, 
+    }, 
+});*/

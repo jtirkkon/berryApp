@@ -1,19 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, Alert } from 'react-native';
 import { Header, Text, ListItem, Overlay } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
 import * as firebase from 'firebase';
 
-//lyhyt painallus -> näyttää kartalla, pitkä painallus -> näyttää tarkemmat tiedot
-//<ListItem bottomDivider onPress={() => navigation.navigate('Map', {addressToShow: item})}  onLongPress={() => deleteAddress(index)}></ListItem>
-//<ion-icon name="locate-outline"></ion-icon>
-//onLongPress={() => deleteAddress(index)}
-/*useEffect(() =>{
-  // Do something here
-  }, [count]);*/
-
-//ToDo: onnistuuko mappaus alkuperäisestä taulukosta? siis kun lähetetään monta paikkaa
 
 function BerryPlaces ({navigation}) {
   const [placeList, setPlaceList] = useState([
@@ -67,74 +58,61 @@ function BerryPlaces ({navigation}) {
     firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
       console.log(data);
-      //Tiedot ja id pitäis nyt saada
-      //const productArray = [];
-      /*if (data) {
-        const tempArray = Object.entries(data);
-        //Get amount, product and firebase-id from data
-        for (let i = 0; i < tempArray.length; i++) {
-          productArray.push({amount: tempArray[i][1].amount,  product: tempArray[i][1].product, id: tempArray[i][0]});
-        }
+      const tempArray = Object.entries(data);
+      const dataArray = [];
+      //console.log(Object.entries(data));
+      for (let i = 0; i < tempArray.length; i++) {
+        dataArray.push({berry: tempArray[i][1].berry,  placeName: tempArray[i][1].placeName, litres: tempArray[i][1].litres,  
+        position: tempArray[i][1].position, time: tempArray[i][1].time, memo: tempArray[i][1].memo,  isSelected: false,  id: tempArray[i][0]});
       }
-      setShoppingList(productArray);*/
+      //console.log("dataArr", dataArray);
+      setPlaceList(dataArray);
     });  
   }
 
-  /*useEffect(() =>{
-    // Do something here
-    }, [placeList]);*/
+  const showData = (item) => {
+    console.log("item", item.placeName);
+    setOverlayVisible(!overlayVisible);
+    setOverlayText({berry: item.berry, placeName: item.placeName, litres: item.litres, time: item.time, memo: item.memo});
+  }
 
-  /*const newList = list.map((item) => {
-    if (item.id === id) {
-      const updatedItem = {
-        ...item,
-        isComplete: !item.isComplete,
-      };
-
-      return updatedItem;
-    }
-
-    return item;
-  });
-
-  setList(newList);*/
-
-
-
-const showData = (item) => {
-  console.log("item", item.placeName);
-  setOverlayVisible(!overlayVisible);
-  setOverlayText({berry: item.berry, placeName: item.placeName, litres: item.litres, time: item.time, memo: item.memo});
-}
-
-const deleteItem = () => {
-  console.log("del");
-}
+  const deleteItem = (placeName, id) => {
+    //console.log("deleteItem", id);
+    Alert.alert(
+      `Delete ${placeName}?`,
+      '',
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel"
+        },
+        { 
+          text: "OK", onPress: () => {
+            let productRef = firebase.database().ref('data/' + id);
+            productRef.remove();
+          } 
+        }
+      ]
+    );
+    getData();
+  }
 
 
 
-const selectBerryPlace = (index) => {
-  //setSelectedPlaces(placeList.filter((item, i) => i === index));
-  
-  let tempArr = placeList;
-  
-  tempArr[index].isSelected = !tempArr[index].isSelected;
-  //tempArr[index].testi = 'OK';
-  //const doubled = numbers.map((number) => number * 2);
-  setPlaceList(tempArr);
-  setSelectedPlaces(placeList.filter((item) => item.isSelected === true));
-  
-  //Näillä kahdella renderöinnillä toimii, tutkitaan vielä pakkorenderöintiä
-  //Näyttäis toimivan välitys, sitten tietojen näyttö, kokeillaan vielä jotain kuvaketta
-  setLocationIcon('green');
-  setLocationIcon('black');
-  //setLocationIcon('red');
-  //tempArr = [];
-  //Tämä tulostus? Vaihtaa nyt truet.
-  
-  //console.log("placeList", placeList);
-  
-}
+  const selectBerryPlace = (index) => {
+    let tempArr = placeList;
+    tempArr[index].isSelected = !tempArr[index].isSelected;
+    setPlaceList(tempArr);
+    setSelectedPlaces(placeList.filter((item) => item.isSelected === true));
+    //Näillä kahdella renderöinnillä toimii, tutkitaan vielä pakkorenderöintiä
+    //Näyttäis toimivan välitys, sitten tietojen näyttö, kokeillaan vielä jotain kuvaketta
+    setLocationIcon('green');
+    setLocationIcon('black');
+    //setLocationIcon('red');
+    //tempArr = [];
+    //Tämä tulostus? Vaihtaa nyt truet.
+  }
 
 //Kokeillaan tuota taustaväriä
   //nämä oli #E0FFFF   87CEFA #00BFFF
@@ -144,16 +122,17 @@ const selectBerryPlace = (index) => {
   //navigation.navigate('Map', {placePosition: item.position, berry: item.berry, placeName: item.placeName, time: item.time, placePermission: true})
   //navigation.navigate('Map', {placePosition: item.position, berry: item.berry, placeName: item.placeName, time: item.time, placePermission: true})}
   //onLongPress={() => selectBerryPlace(index)} >
+  
 
-
-  //Jotain hämminkiä on kun välittää vain yhden komponentin!!!!! taulukko?
-   
+  
+  //containerStyle={{width: 400}} Tällä sais leveämmäksi
   renderItem = ({ item, index }) => (
     <ListItem bottomDivider onPress={() => 
     navigation.navigate('Map', {selectedBerryPlaces: [item], placePermission: true})}
-    onLongPress={() => selectBerryPlace(index)} >
-      <ListItem.Content>
-        <ListItem.Title >{item.berry}, {item.placeName}</ListItem.Title>
+    onLongPress={() => selectBerryPlace(index)} containerStyle={{alignContent: 'space-between'}}>
+      <ListItem.Content style={{minWidth: 50}}>
+        <ListItem.Title>{item.berry}</ListItem.Title>
+        <ListItem.Title>{item.placeName}</ListItem.Title>
         <ListItem.Subtitle>{item.time}</ListItem.Subtitle>
         <ListItem.Subtitle>{item.litres} litres</ListItem.Subtitle>
       </ListItem.Content>
@@ -161,13 +140,15 @@ const selectBerryPlace = (index) => {
         <Icon reverse name='information-outline' type='ionicon' color={item.isSelected ? '#008000' : '#BDB76B'} onPress={() => showData(item)}/>
       </ListItem.Content>
       <ListItem.Content>
-        <Icon reverse name='trash-bin-outline' type='ionicon' color='red' onPress={() => deleteItem(index)}/>
+        <Icon reverse name='trash-bin-outline' type='ionicon' color='red' onPress={() => deleteItem(item.placeName, item.id)}/>
       </ListItem.Content>
       
     </ListItem>
   );
 
   //erillinen lista joka välit <ion-icon name="information-outline"></ion-icon>
+  //rightComponent = {{icon:'help', color:'#fff'}}
+  //rightComponent = {<Icon name='help' type='ionicon' color='black'/>}
   
   return (
     <View style={styles.container}>
@@ -175,7 +156,7 @@ const selectBerryPlace = (index) => {
         leftComponent = {<Text h4 onPress = {() => navigation.navigate('Map')}>Map</Text>}
         centerComponent={<Text h4 onPress = {() => 
         navigation.navigate('Map', {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true})}>Show selected</Text>}
-        rightComponent = {{icon:'help', color:'#fff'}}
+        rightComponent = {<Text h4 onPress = {() => navigation.navigate('Help')}>Help</Text>}
       />
       <FlatList 
         data={placeList}
@@ -186,7 +167,7 @@ const selectBerryPlace = (index) => {
       
       
        
-       <StatusBar style="auto" />
+      <StatusBar style="auto" />
 
        <Overlay isVisible={overlayVisible} onBackdropPress={() => setOverlayVisible(false)}>
         <View >
