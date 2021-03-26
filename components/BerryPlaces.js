@@ -8,8 +8,7 @@ import * as firebase from 'firebase';
 
 function BerryPlaces ({navigation}) {
   const [placeList, setPlaceList] = useState([
-  {berry: 'Blueberry', placeName: 'Koilismaa', litres: '8', position: {latitude: 65.21501231101409, longitude: 26.29520234366442}, time: '26.7.2020', memo: 'Hyvä mustikkapaikka lähellä tietä. Kuinka näkyy pitkä memo, vieläkin jatkuu ja vielä', isSelected: false}, 
-  {berry: 'Lingonberry', placeName: 'Savo', litres: '15', position: {latitude: 62.97748114412601, longitude: 28.55870413715181}, time: '26.7.2020', memo: 'Hyvä puolukkapaikka.', isSelected: false},
+  
   {berry: 'Blueberry', placeName: 'Melaniemi', litres: '10', position: {latitude: 63.08142706042671, longitude: 21.68541496994636}, time: '1.8.2020', memo: 'Mustikkamaa.', isSelected: false}
 ]);
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -106,7 +105,8 @@ function BerryPlaces ({navigation}) {
     setPlaceList(tempArr);
     setSelectedPlaces(placeList.filter((item) => item.isSelected === true));
     //Näillä kahdella renderöinnillä toimii, tutkitaan vielä pakkorenderöintiä
-    //Näyttäis toimivan välitys, sitten tietojen näyttö, kokeillaan vielä jotain kuvaketta
+    
+    //Tätä tutkittava
     setLocationIcon('green');
     setLocationIcon('black');
     //setLocationIcon('red');

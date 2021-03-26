@@ -23,7 +23,6 @@ function SavePlace ({navigation, route}) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [otherSelection, setOtherSelection] = useState('Other');
 
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
     apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
     authDomain: "berryapp-e2c7e.firebaseapp.com",
@@ -42,16 +41,16 @@ function SavePlace ({navigation, route}) {
   }
   
   const {position} = route.params;
-  console.log(position);
+  console.log("in save place", position);
   //Pitäiskö position tallettaa stateen?
-  //Vai tuleeko memoryleak siitä, jos valitse mitään marjaa?
+  //Vai tuleeko memoryleak siitä, jos ei valitse mitään marjaa?
   
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
   console.log(time);
   
   const savePlace = () => {
-    console.log("testFB");
+    //console.log("testFB");
     firebase.database().ref('data/').push(
         {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': time, 'memo': memo}
       );
