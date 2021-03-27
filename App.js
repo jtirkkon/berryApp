@@ -6,10 +6,14 @@ import SavePlace from './components/SavePlace';
 import BerryPlaces from './components/BerryPlaces';
 import Help from './components/Help';
 //import MyPlaces from './components/MyPlaces'
-//Todo: Seuraavaksi kartalta klikkaus valmiiksi, button, siirtyminen jne. Sitten help valmiiksi.
+//Bugit:  - Markkerin päivitys
+//Position homma on tehtävä ekana?
+//Päivittyykö oma sijainti, onko oltava joku timeri
+// - Setting timer
+// - React state update
+//Todo: - Aika inputti vielä saveen, johon defaulttina nykyinen aika.
 //Nauhoitus kännykästä
-//emulaattirin kokeiu
-//tallennus ja Kaikki tallennetut paikat, komponentit
+//emulaattirin kokeilu
 
 const Stack = createStackNavigator();
 

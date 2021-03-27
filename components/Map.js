@@ -148,6 +148,13 @@ function Map ({navigation, route}) {
     console.log("handleCoordinatesSelection", coordinatesFromMap);
   }
 
+  const selectOwnLocation = () => {
+    getLocation();
+    //ei ehdi mukaan
+    console.log("mikä on position", position);
+    navigation.navigate('Save new place', {position: position});
+  }
+
   const selectPlaceFromMap = (event) => {
     console.log(event.nativeEvent.coordinate);
     console.log("ennen iffiä", coordinatesFromMap);
@@ -162,12 +169,14 @@ function Map ({navigation, route}) {
   //navigation.navigate('History', {history: calculations}
   //onPress={(event) => this.handlePress(event)}>
   //tehdään täällä updatemappostion
+  //hakee täällä uudestaan getposiotionin, jos valinta on päällä
+  //leftComponent = {<Text h4 onPress = {() => navigation.navigate('Save new place', {position: position})}>Save</Text>}
   return (
     <View style={styles.container}>
       <Header
-        leftComponent = {<Text h4 onPress = {() => navigation.navigate('Save new place', {position: position})}>Save</Text>}
+        leftComponent = {<Text h4 onPress = {selectOwnLocation}>Save</Text>}
         centerComponent={<Text h4 onPress = {() => navigation.navigate('Berry places')}>Show places</Text>}
-        rightComponent = {{icon:'help', color:'#fff'}}
+        rightComponent = {<Text h4 onPress = {() => navigation.navigate('Help')}>Help</Text>}
         
       />
       <MapView

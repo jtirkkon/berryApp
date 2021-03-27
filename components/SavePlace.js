@@ -9,7 +9,7 @@ import { Icon } from'react-native-elements';
 
 //Nyt oma tietokanta testataan sen toiminta. Ensin tallennus
 //Tietokantaan tallennus:
-//Unmounted component: tulee vain silloin tällöin. Suosikeissa on yksi sivu tallennettuna.
+//Unmounted component: tulee vain silloin tällöin. Suosikeissa on yksi sivu tallennettuna. Tuleeko, jos esim. litres on tyhjä?
 //Settin timer?
 
 //1. Tietokannasta pitäisi nyt koittaa lukea tiedot!
@@ -95,7 +95,7 @@ function SavePlace ({navigation, route}) {
       <Header
         leftComponent = {<Text h4 onPress = {() => navigation.navigate('Map')}>Map</Text>}
         centerComponent={<Text h4 onPress = {() => navigation.navigate('Berry places')}>Show places</Text>}
-        rightComponent = {{icon:'help', color:'#fff'}}
+        rightComponent = {<Text h4 onPress = {() => navigation.navigate('Help')}>Help</Text>}
       />
       
       <ScrollView>
