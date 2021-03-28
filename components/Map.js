@@ -4,106 +4,42 @@ import { StyleSheet, View, Alert} from 'react-native';
 import MapView, { Marker} from'react-native-maps';
 import * as Location from 'expo-location';
 import { Header } from 'react-native-elements';
-import { Button } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
 
 //Bugit: Markkerin tiedot ei päivity, ennenkuin sitä klikkaa uudestaan.
 
-/*<View style={{ flex: 1 }}>
-    <MapView
-      style={{ flex: 1 }}
-    />
-    <View
-        style={{
-            position: 'absolute',//use absolute position to show button on top of the map
-            top: '50%', //for center align
-            alignSelf: 'flex-end' //for align to right
-        }}
-    >
-        <Button />
-    </View>
-</View>*/
-
-/*<MapView
-          style={styles.map}
-          initialRegion={{
-            latitude: this.state.currentLatitude,
-            longitude: this.state.currentLongitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          region={{
-            latitude: this.state.currentLatitude,
-            longitude: this.state.currentLongitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          customMapStyle={mapStyle}
-          onPress={(event) => this.handlePress(event)}></MapView>*/
-
-/*const NavigateToSavePlace = ({navigation}) => {
-  return (
-    <Icon type="material" name="save" onPress = {() => navigation.navigate('SaveNewPlace')}/>
-  )
-}*/
-
-//leftComponent = {<Icon type="material" name="save" text="Save" onPress = {() => navigation.navigate('Save new place')}/>}
-
-
 function Map ({navigation, route}) {
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
   //const [currentMapPosition, setCurrentMapPosition] = useState({latitude: 60.17, longitude: 24.94});
-  const [positionMarker, setPositionMarker] = useState({latitude: 0, longitude: 0});
-  //const [placeMarker, setPlaceMarker] = useState({latitude: 100, longitude: 200, berry: '', placeName: '', time: ''});
-  //placeMarkers nimen vaihto
+  const [positionMarker, setPositionMarker] = useState({latitude: 100, longitude: 200});
   const [placeMarkers, setPlaceMarkers] = useState([{position: {latitude: 100, longitude: 200}, berry: '', placeName: ''}]);
   const [coordinatesFromMap, setCoordinatesFromMap] = useState(false);
+  const [userPosition, setUserPosition] = useState({latitude: 100, longitude: 200})
 
-  currentMapPosition = {latitude: 60.17, longitude: 24.94};
-  
-  
-  //let coordinatesFromMap;
-  //let coordinateIconColor = 'grey';
-  
-
-  /*{latitude: 63.08550590078892, longitude: 21.66948688445667, berry: 'blueberry', placeName: 'ström', time: '2.7.2020'},
-  {latitude: 63.08300590078892, longitude: 21.69348688445667, berry: 'lingonberry', placeName: 'ström2', time: '5.7.2018'},
-  {latitude: 63.07300590078892, longitude: 21.69548688445667, berry: 'lingonberry', placeName: 'ström3', time: '5.7.2016'},]);*/
+  //Tässä bugi, menee välillä näihin koordinaatteihin
+  currentMapPosition = {latitude: 61.17, longitude: 24.94};
   
   
   
-  //Joku eri ehto, kun tulee useita markkereita
   if (route.params) {
-    console.log("params in map", route.params);
+    //console.log("params in map", route.params);
     if (route.params.placePermission) {
-      //Testimarkkereihin tiedot
       setPlaceMarkers(route.params.selectedBerryPlaces);
-      console.log("placeMarkers", placeMarkers);
+      //console.log("placeMarkers", placeMarkers);
       const placePosition = route.params.selectedBerryPlaces[0].position;
-      /*const berry = route.params.berry;
-      const placeName = route.params.placeName;
-      const time = route.params.time;*/
-      //console.log(placePosition);
-      //console.log("if", route.params.placePosition.latitude);
-      //setPlacePosition({latitude: route.params.placePosition.latitude, longitude: route.params.placePosition.longitude});
-      
       setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
-      /*setPlaceMarker({latitude: placePosition.latitude, longitude: placePosition.longitude, berry: berry, placeName: placeName, time: time});*/
       route.params.placePermission = false;
     }
-    
   }
   
   useEffect(() => {
-    console.log("useEffect");
+    //console.log("useEffect");
     //coordinatesFromMap = false;
-    //coordinateIconColor = 'grey';
     getLocation();
   }, []);
   
   const getLocation = async() => {
-    //Checkpermission
     let { status} = await Location.requestPermissionsAsync();
     if(status !== 'granted') {
       Alert.alert('No permission to accesslocation');
@@ -111,24 +47,22 @@ function Map ({navigation, route}) {
     else {
       let location = await Location.getCurrentPositionAsync({});
       setPosition({latitude: location.coords.latitude, longitude: location.coords.longitude});
+      setUserPosition({latitude: location.coords.latitude, longitude: location.coords.longitude});
       setPositionMarker({latitude: location.coords.latitude, longitude: location.coords.longitude});
     }
   }
 
-  //tällä päivitetään nykyinen sijainti
   const updateMapPosition = (region) => {
     currentMapPosition = {latitude: region.latitude, longitude: region.longitude};
   }
   
+  //Handles user's selection if coordinates are selected from the map
   const handleCoordinatesSelection = () => {
-    
     if (coordinatesFromMap === false) {
-      console.log("if");
+      //console.log("if");
       setPosition(currentMapPosition);
       setCoordinatesFromMap(true);
-      console.log("iffin sisällä", coordinatesFromMap);
-      //coordinateIconColor = 'green';
-      //setCoordinateIconColor('green');
+      //console.log("handleCoordinatesSelection: coordinatesFromMap", coordinatesFromMap);
       Alert.alert(
         'You can select a location by clicking on the map.',
         '',
@@ -138,46 +72,35 @@ function Map ({navigation, route}) {
           }
         ]
       );
-      //setCoordinateIconColor('green');    
     } else {
       setCoordinatesFromMap(false);
       setPosition(currentMapPosition);
-      //setCoordinateIconColor('grey');
+      
     }
-    //coordinatesFromMap = !coordinatesFromMap;
     console.log("handleCoordinatesSelection", coordinatesFromMap);
   }
 
+  //Function is executed if user save his own position coordinates
   const selectOwnLocation = () => {
-    getLocation();
-    //ei ehdi mukaan
-    console.log("mikä on position", position);
-    navigation.navigate('Save new place', {position: position});
+    navigation.navigate('Save new place', {position: userPosition});
   }
 
+  //Function is executed if user select coordinates by clicking on the map
   const selectPlaceFromMap = (event) => {
-    console.log(event.nativeEvent.coordinate);
-    console.log("ennen iffiä", coordinatesFromMap);
+    //console.log(event.nativeEvent.coordinate);
+    console.log("SelectPlaceFromMap: coordinatesFromMap", coordinatesFromMap);
     if (coordinatesFromMap) {
-      console.log(event.nativeEvent.coordinate);
+      //console.log(event.nativeEvent.coordinate);
       navigation.navigate('Save new place', {position: event.nativeEvent.coordinate});
     }
   }
 
-  
-  
-  //navigation.navigate('History', {history: calculations}
-  //onPress={(event) => this.handlePress(event)}>
-  //tehdään täällä updatemappostion
-  //hakee täällä uudestaan getposiotionin, jos valinta on päällä
-  //leftComponent = {<Text h4 onPress = {() => navigation.navigate('Save new place', {position: position})}>Save</Text>}
   return (
     <View style={styles.container}>
       <Header
         leftComponent = {<Text h4 onPress = {selectOwnLocation}>Save</Text>}
         centerComponent={<Text h4 onPress = {() => navigation.navigate('Berry places')}>Show places</Text>}
         rightComponent = {<Text h4 onPress = {() => navigation.navigate('Help')}>Help</Text>}
-        
       />
       <MapView
         mapType='hybrid'
@@ -196,7 +119,6 @@ function Map ({navigation, route}) {
             longitude: positionMarker.longitude
           }}
             title='You are here'
-            
         />
         
         {placeMarkers.map((marker, index) => (
@@ -224,24 +146,6 @@ function Map ({navigation, route}) {
     </View>
   );          
 }
-
-/*
-//fontawesomesta 
-<Icon reverse name='pointer' type='evilicon' color='red' onPress={handleCoordinatesSelection}/>
-<Marker
-          coordinate={{
-            latitude: placeMarker.latitude,
-            longitude: placeMarker.longitude
-          }}
-          title={`${placeMarker.berry}`}
-          description={`${placeMarker.placeName}, ${placeMarker.time}`}
-        />
-
-/*onPress={() =>
-  Alert.alert(
-    'paikan markkeri',
-  )
-}*/
 
 const styles = StyleSheet.create({
   container: {

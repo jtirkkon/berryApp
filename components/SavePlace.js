@@ -7,18 +7,15 @@ import * as firebase from 'firebase';
 
 import { Icon } from'react-native-elements';
 
-//Nyt oma tietokanta testataan sen toiminta. Ensin tallennus
-//Tietokantaan tallennus:
 //Unmounted component: tulee vain silloin tällöin. Suosikeissa on yksi sivu tallennettuna. Tuleeko, jos esim. litres on tyhjä?
-//Settin timer?
-
-//1. Tietokannasta pitäisi nyt koittaa lukea tiedot!
-//Ikkuna, jos valitsee muun, tämä seuraavaksi. Jatketaan tätä kuntoon! Ei kunnolla toimi.
+//Setting timer?
+//aika inputti tänne.
 
 function SavePlace ({navigation, route}) {
   const [selectedBerry, setSelectedBerry] = useState('');
   const [placeName, setPlaceName] = useState('');
   const [litres, setLitres] = useState('');
+  const [date, setDate] = useState('');
   const [memo, setMemo] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [otherSelection, setOtherSelection] = useState('Other');
@@ -47,10 +44,9 @@ function SavePlace ({navigation, route}) {
   
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
-  console.log(time);
+  //console.log(time);
   
   const savePlace = () => {
-    //console.log("testFB");
     firebase.database().ref('data/').push(
         {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': time, 'memo': memo}
       );
@@ -67,10 +63,10 @@ function SavePlace ({navigation, route}) {
   }
 
   const handlePickerValueChange = (value, index) => {
-    console.log("handle", value);
-    console.log("index", index);
+    //console.log("handle", value);
+    //console.log("index", index);
     if (index === 7) {
-      console.log("other");
+      //console.log("other");
       setOtherSelection('');
       setModalVisible(true);
     } else {
@@ -84,12 +80,7 @@ function SavePlace ({navigation, route}) {
     setModalVisible(false);
   }
 
-  /*<Picker
-          selectedValue={selectedBerry}
-          style={{ height: 50, width: 250, marginTop: 20, marginBottom: 20 }}
-          onValueChange={(itemValue, itemIndex) => setSelectedBerry(itemValue)}
-        ></Picker>*/
-
+  //Date inputti vielä
   return (
     <View style={styles.container}>
       <Header
@@ -116,6 +107,7 @@ function SavePlace ({navigation, route}) {
         
         <Input label = 'Place name' onChangeText={text => setPlaceName(text)} value={placeName}/>
         <Input label = 'Litres' keyboardType = 'number-pad' onChangeText={text => setLitres(text)} value={litres}/>
+        <Input label = 'Date' onChangeText={text => setDate(text)} value={date}/>
         <Input label = 'Memo' multiline onChangeText={text => setMemo(text)} value={memo}/>
         <Button icon={{name: 'save'}} title='SAVE' buttonStyle={{width: 250, alignSelf: 'center' }} onPress={savePlace}></Button>
       </ScrollView>
@@ -144,9 +136,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    //justifyContent: 'center',
-    //alignItems: 'center', 
-    //paddingTop: 30
   },
   viewWrapper: { 
     flex: 1, 
@@ -175,55 +164,6 @@ const styles = StyleSheet.create({
 
 export default SavePlace;
 
-
-/*Modal esimerkki inputilla
-import { StatusBar } from "expo-status-bar"; 
-import React, { useState } from "react"; 
-import { Button, SafeAreaView, StyleSheet, Modal,  
-         View, TextInput, Dimensions } from "react-native"; 
-  
-const { width } = Dimensions.get("window"); 
-  
-export default function App() { 
-    
-    // This is to manage Modal State 
-    const [isModalVisible, setModalVisible] = useState(false); 
-  
-    // This is to manage TextInput State 
-    const [inputValue, setInputValue] = useState(""); 
-  
-    // Create toggleModalVisibility function that will 
-    // Open and close modal upon button clicks. 
-    const toggleModalVisibility = () => { 
-        setModalVisible(!isModalVisible); 
-    }; 
-  
-    return ( 
-        <SafeAreaView style={styles.screen}> 
-            <StatusBar style="auto" /> 
-  
-            {/**  We are going to create a Modal with Text Input. } 
-            <Button title="Show Modal" onPress={toggleModalVisibility} /> 
-  
-            {/** This is our modal component containing textinput and a button } 
-            /*<Modal animationType="slide" 
-                   transparent visible={isModalVisible}  
-                   presentationStyle="overFullScreen" 
-                   onDismiss={toggleModalVisibility}> 
-                <View style={styles.viewWrapper}> 
-                    <View style={styles.modalView}> 
-                        <TextInput placeholder="Enter something..." 
-                                   value={inputValue} style={styles.textInput}  
-                                   onChangeText={(value) => setInputValue(value)} /> 
-  
-                        {This button is responsible to close the modal } 
-                        <Button title="Close" onPress={toggleModalVisibility} /> 
-                    </View> 
-                </View> 
-            </Modal> 
-        </SafeAreaView> 
-    ); 
-} */
   
 // These are user defined styles 
 /*const styles = StyleSheet.create({ 

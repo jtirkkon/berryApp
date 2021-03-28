@@ -56,7 +56,7 @@ function BerryPlaces ({navigation}) {
   const getData = () => {
     firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
-      console.log(data);
+      //console.log(data);
       const tempArray = Object.entries(data);
       const dataArray = [];
       //console.log(Object.entries(data));

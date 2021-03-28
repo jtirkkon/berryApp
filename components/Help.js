@@ -30,9 +30,9 @@ function Help() {
         <View style={{marginLeft: 'auto', marginRight: 'auto', marginTop: 30}}>
           <Text h3>BerryPlaces</Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginRight: 50}}>
           <Icon reverse name='information-outline' type='ionicon' color='#BDB76B'/>
-          <Text style={styles.textStyle}>Press to see information from the place.</Text>
+          <Text style={styles.textStyle}>Press to see the information from the place.</Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Icon reverse name='trash-bin-outline' type='ionicon' color='red'/>
@@ -43,6 +43,7 @@ function Help() {
         <Text style={{fontWeight: 'bold'}}> long press</Text> the item. The color of information icon turns green. To see selected places, press
         <Text style={{fontWeight: 'bold'}}> Show selected.</Text> The map navigates to location of first item.</Text>
       </ScrollView>
+      <StatusBar style="auto" />
     </View>
   );
 }

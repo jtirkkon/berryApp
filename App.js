@@ -7,7 +7,8 @@ import BerryPlaces from './components/BerryPlaces';
 import Help from './components/Help';
 //import MyPlaces from './components/MyPlaces'
 //Bugit:  - Markkerin päivitys
-//Position homma on tehtävä ekana?
+//Position homma on tehtävä ekana... Ehkä tämä vois nyt toimia, kartta tietysta tarkentaa aina sijaintia, jos se on laajemmalla.
+//Tein oman staten vielä käyttäjän sijainnille.
 //Päivittyykö oma sijainti, onko oltava joku timeri
 // - Setting timer
 // - React state update
