@@ -7,7 +7,8 @@ import { Header } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
 
-//Bugit: Markkerin tiedot ei päivity, ennenkuin sitä klikkaa uudestaan.
+//Bugit: Markkerin tiedot ei päivity, ennenkuin sitä klikkaa uudestaan. callout, showCallout pitäiskö tätä käyttää jotenkin.
+//Tätä pitäis tutkia.
 
 function Map ({navigation, route}) {
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
@@ -15,10 +16,13 @@ function Map ({navigation, route}) {
   const [positionMarker, setPositionMarker] = useState({latitude: 100, longitude: 200});
   const [placeMarkers, setPlaceMarkers] = useState([{position: {latitude: 100, longitude: 200}, berry: '', placeName: ''}]);
   const [coordinatesFromMap, setCoordinatesFromMap] = useState(false);
-  const [userPosition, setUserPosition] = useState({latitude: 100, longitude: 200})
+  const [userPosition, setUserPosition] = useState({latitude: 100, longitude: 200});
+  const [otsikko, setOtsikko] = useState('');
 
-  //Tässä bugi, menee välillä näihin koordinaatteihin
-  currentMapPosition = {latitude: 61.17, longitude: 24.94};
+  
+  //tuleekohan tästä joku varoitus kuitenkin
+  currentMapPosition = {latitude: 0, longitude: 0};
+  console.log("map render");
   
   
   
@@ -38,6 +42,10 @@ function Map ({navigation, route}) {
     //coordinatesFromMap = false;
     getLocation();
   }, []);
+
+  useEffect(() => {
+
+  }, [placeMarkers])
   
   const getLocation = async() => {
     let { status} = await Location.requestPermissionsAsync();
@@ -85,7 +93,7 @@ function Map ({navigation, route}) {
     navigation.navigate('Save new place', {position: userPosition});
   }
 
-  //Function is executed if user select coordinates by clicking on the map
+  //Function is executed if user select coordinates by clickng on the map
   const selectPlaceFromMap = (event) => {
     //console.log(event.nativeEvent.coordinate);
     console.log("SelectPlaceFromMap: coordinatesFromMap", coordinatesFromMap);
@@ -94,6 +102,12 @@ function Map ({navigation, route}) {
       navigation.navigate('Save new place', {position: event.nativeEvent.coordinate});
     }
   }
+
+  const markerTesti = (marker) => {
+    setOtsikko(marker.title);
+  }
+
+  
 
   return (
     <View style={styles.container}>
@@ -128,8 +142,10 @@ function Map ({navigation, route}) {
             latitude: marker.position.latitude,
             longitude: marker.position.longitude
           }}
-          title={marker.berry}
-          description={`${marker.placeName}, ${marker.time}`}
+          onPress={() => markerTesti(marker)}
+          title={otsikko}
+          
+          
           />
           ))}
 

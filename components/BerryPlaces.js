@@ -7,16 +7,12 @@ import * as firebase from 'firebase';
 
 
 function BerryPlaces ({navigation}) {
-  const [placeList, setPlaceList] = useState([
-  
-  {berry: 'Blueberry', placeName: 'Melaniemi', litres: '10', position: {latitude: 63.08142706042671, longitude: 21.68541496994636}, time: '1.8.2020', memo: 'Mustikkamaa.', isSelected: false}
-]);
+  const [placeList, setPlaceList] = useState([]);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayText, setOverlayText] = useState({});
-  const [selectedPlaces, setSelectedPlaces] = useState([]);
-  const [locationIcon, setLocationIcon] = useState('black');
-  //State tänne, johon talletetaan useat paikat.
-
+  //Tarviiko tätä?const [selectedPlaces, setSelectedPlaces] = useState([]);
+  const [temp, setTemp] = useState('black');
+  
   const firebaseConfig = {
     apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
     authDomain: "berryapp-e2c7e.firebaseapp.com",
@@ -38,21 +34,6 @@ function BerryPlaces ({navigation}) {
     getData();
   }, []);
 
-  /*const getProducts = () => {
-    firebase.database().ref('items/').on('value', snapshot => {
-      const data = snapshot.val();
-      const productArray = [];
-      if (data) {
-        const tempArray = Object.entries(data);
-        //Get amount, product and firebase-id from data
-        for (let i = 0; i < tempArray.length; i++) {
-          productArray.push({amount: tempArray[i][1].amount,  product: tempArray[i][1].product, id: tempArray[i][0]});
-        }
-      }
-      setShoppingList(productArray);
-    });
-  }*/
-
   const getData = () => {
     firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
@@ -64,13 +45,13 @@ function BerryPlaces ({navigation}) {
         dataArray.push({berry: tempArray[i][1].berry,  placeName: tempArray[i][1].placeName, litres: tempArray[i][1].litres,  
         position: tempArray[i][1].position, time: tempArray[i][1].time, memo: tempArray[i][1].memo,  isSelected: false,  id: tempArray[i][0]});
       }
-      //console.log("dataArr", dataArray);
+      //console.log("dataArray:", dataArray);
       setPlaceList(dataArray);
     });  
   }
 
   const showData = (item) => {
-    console.log("item", item.placeName);
+    //console.log("showData", item.placeName);
     setOverlayVisible(!overlayVisible);
     setOverlayText({berry: item.berry, placeName: item.placeName, litres: item.litres, time: item.time, memo: item.memo});
   }
@@ -97,34 +78,18 @@ function BerryPlaces ({navigation}) {
     getData();
   }
 
-
-
   const selectBerryPlace = (index) => {
     let tempArr = placeList;
     tempArr[index].isSelected = !tempArr[index].isSelected;
     setPlaceList(tempArr);
-    setSelectedPlaces(placeList.filter((item) => item.isSelected === true));
+    //setSelectedPlaces(placeList.filter((item) => item.isSelected === true));
     //Näillä kahdella renderöinnillä toimii, tutkitaan vielä pakkorenderöintiä
     
     //Tätä tutkittava
-    setLocationIcon('green');
-    setLocationIcon('black');
-    //setLocationIcon('red');
-    //tempArr = [];
-    //Tämä tulostus? Vaihtaa nyt truet.
+    setTemp('green');
+    setTemp('black');
   }
 
-//Kokeillaan tuota taustaväriä
-  //nämä oli #E0FFFF   87CEFA #00BFFF
-  //() => showData(item)    
-  //<Icon type="material" color='green' name="info" onPress={() => showData(index)}/>
-  //<Icon type="material" color="red" name="delete" onPress={() => deleteProduct(index)}/>
-  //navigation.navigate('Map', {placePosition: item.position, berry: item.berry, placeName: item.placeName, time: item.time, placePermission: true})
-  //navigation.navigate('Map', {placePosition: item.position, berry: item.berry, placeName: item.placeName, time: item.time, placePermission: true})}
-  //onLongPress={() => selectBerryPlace(index)} >
-  
-
-  
   //containerStyle={{width: 400}} Tällä sais leveämmäksi
   renderItem = ({ item, index }) => (
     <ListItem bottomDivider onPress={() => 
@@ -146,10 +111,6 @@ function BerryPlaces ({navigation}) {
     </ListItem>
   );
 
-  //erillinen lista joka välit <ion-icon name="information-outline"></ion-icon>
-  //rightComponent = {{icon:'help', color:'#fff'}}
-  //rightComponent = {<Icon name='help' type='ionicon' color='black'/>}
-  
   return (
     <View style={styles.container}>
       <Header
@@ -163,10 +124,6 @@ function BerryPlaces ({navigation}) {
         keyExtractor={(item, index) => index.toString()} 
         renderItem={renderItem} 
       />
-      
-      
-      
-       
       <StatusBar style="auto" />
 
        <Overlay isVisible={overlayVisible} onBackdropPress={() => setOverlayVisible(false)}>
@@ -200,7 +157,5 @@ const styles = StyleSheet.create({
     height: 40  
   }
 });
-
-
 
 export default BerryPlaces;

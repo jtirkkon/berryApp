@@ -3,6 +3,8 @@ import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Alert, ScrollView, Modal } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
+//Setting a timer for a long period of time, i.e. multiple minutes, is a performance and correctness issue on Android??? 
+import { LogBox } from 'react-native';
 import * as firebase from 'firebase';
 
 import { Icon } from'react-native-elements';
@@ -12,10 +14,15 @@ import { Icon } from'react-native-elements';
 //aika inputti tänne.
 
 function SavePlace ({navigation, route}) {
+  LogBox.ignoreLogs(['Setting a timer']);
+  
+  let currentTime = new Date();
+  const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
+  
   const [selectedBerry, setSelectedBerry] = useState('');
   const [placeName, setPlaceName] = useState('');
   const [litres, setLitres] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(time);
   const [memo, setMemo] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [otherSelection, setOtherSelection] = useState('Other');
@@ -38,17 +45,16 @@ function SavePlace ({navigation, route}) {
   }
   
   const {position} = route.params;
-  console.log("in save place", position);
+  console.log("in save place pos.", position);
   //Pitäiskö position tallettaa stateen?
   //Vai tuleeko memoryleak siitä, jos ei valitse mitään marjaa?
   
-  let currentTime = new Date();
-  const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
+  
   //console.log(time);
   
   const savePlace = () => {
     firebase.database().ref('data/').push(
-        {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': time, 'memo': memo}
+        {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': date, 'memo': memo}
       );
 
     Alert.alert(
@@ -59,7 +65,10 @@ function SavePlace ({navigation, route}) {
           text: "OK", onPress: () => {} 
         }
       ]
-    );    
+    );
+    setPlaceName('');
+    setLitres('');
+    setMemo('');    
   }
 
   const handlePickerValueChange = (value, index) => {
@@ -203,3 +212,40 @@ export default SavePlace;
         marginBottom: 8, 
     }, 
 });*/
+
+/*
+ Can't perform a React state update on an unmounted component. 
+ This is a no-op, but it indicates a memory leak in your application. 
+ To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
+ 
+ Tuli ainakin silloin, kun tulin takaisin show placesista ja tallensin, tuleekohan tämä vain yhden kerran. 
+ Näin kävi myös toisen kerran.
+ Kaikki valittu -> varoitus tuli
+ - Ei valittu mitään -> varoitus tuli
+ - Myös vaikka kävi välillä mapissa, niin varoitus tuli ainakin savea painamalla.
+ - Tuli myös kartasta koordinaatit valitsemalla
+ - Entä jos ei käy ollenkaan Berry placesissa? -> Silloin ei näyttäis tulevan
+ - Berry Placesissa käyminen, sen jotenkin taitaa aiheuttaa...
+ - Pitäis kokeilla saada firebase vain yhteen paikkaan -> tämä ekaksi!
+
+ For me, clean the state in the unmount of the component helped.
+
+ const [state, setState] = useState({});
+
+useEffect(() => {
+    myFunction();
+    return () => {
+      setState({}); // This worked for me
+    };
+}, []);
+
+const myFunction = () => {
+    setState({
+        name: 'Jhon',
+        surname: 'Doe',
+    })
+
+
+
+
+*/
