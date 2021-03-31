@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, View, FlatList, Alert } from 'react-native';
 import { Header, Text, ListItem, Overlay } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
 import * as firebase from 'firebase';
+import testiContext from './Firebase';
 
 
 function BerryPlaces ({navigation}) {
@@ -12,8 +13,10 @@ function BerryPlaces ({navigation}) {
   const [overlayText, setOverlayText] = useState({});
   //Tarviiko tätä?const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [temp, setTemp] = useState('black');
+
+  const {fireDB} = useContext(testiContext);
   
-  const firebaseConfig = {
+  /*const firebaseConfig = {
     apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
     authDomain: "berryapp-e2c7e.firebaseapp.com",
     databaseURL: "https://berryapp-e2c7e-default-rtdb.europe-west1.firebasedatabase.app",
@@ -24,18 +27,20 @@ function BerryPlaces ({navigation}) {
     measurementId: "G-HW99C0YXLW"
   };
 
+  firebase.app();
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
    } else {
     firebase.app(); // if already initialized, use that one
-  }
+  }*/
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = () => {
-    firebase.database().ref('data/').on('value', snapshot => {
+    fireDB.database().ref('data/').on('value', snapshot => {
+    //firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
       //console.log(data);
       const tempArray = Object.entries(data);
@@ -69,7 +74,8 @@ function BerryPlaces ({navigation}) {
         },
         { 
           text: "OK", onPress: () => {
-            let productRef = firebase.database().ref('data/' + id);
+            let productRef = fireDB.database().ref('data/' + id);
+            //let productRef = firebase.database().ref('data/' + id);
             productRef.remove();
           } 
         }

@@ -1,13 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { StyleSheet, View, Alert, ScrollView, Modal } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
+//import * as firebase from 'firebase';
 //Setting a timer for a long period of time, i.e. multiple minutes, is a performance and correctness issue on Android??? 
-import { LogBox } from 'react-native';
 import * as firebase from 'firebase';
+import { LogBox } from 'react-native';
+
+//import firebaseConfig from './Firebase'
 
 import { Icon } from'react-native-elements';
+import testiContext from './Firebase';
 
 //Unmounted component: tulee vain silloin tällöin. Suosikeissa on yksi sivu tallennettuna. Tuleeko, jos esim. litres on tyhjä?
 //Setting timer?
@@ -15,6 +19,10 @@ import { Icon } from'react-native-elements';
 
 function SavePlace ({navigation, route}) {
   LogBox.ignoreLogs(['Setting a timer']);
+
+  //Ainakin configin saa välitettyä
+  const {fireDB} = useContext(testiContext);
+  console.log(fireDB);
   
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
@@ -53,9 +61,12 @@ function SavePlace ({navigation, route}) {
   //console.log(time);
   
   const savePlace = () => {
-    firebase.database().ref('data/').push(
+    fireDB.database().ref('data/').push(
+      {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': date, 'memo': memo}
+    );
+    /*firebase.database().ref('data/').push(
         {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': date, 'memo': memo}
-      );
+      );*/
 
     Alert.alert(
       'Data saved',
