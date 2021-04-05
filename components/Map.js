@@ -1,30 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { StyleSheet, View, Alert} from 'react-native';
-import MapView, { Marker} from'react-native-maps';
+import MapView, { Callout, Marker} from'react-native-maps';
 import * as Location from 'expo-location';
 import { Header } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
+import { LogBox } from 'react-native';
 
-//Bugit: Markkerin tiedot ei päivity, ennenkuin sitä klikkaa uudestaan. callout, showCallout pitäiskö tätä käyttää jotenkin.
-//Tätä pitäis tutkia.
+//Bugit: Markkerin tiedot ei päivity
+//Koordinaatit on/of testaus
 
 function Map ({navigation, route}) {
+  LogBox.ignoreLogs(['Setting a timer']);
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
   //const [currentMapPosition, setCurrentMapPosition] = useState({latitude: 60.17, longitude: 24.94});
   const [positionMarker, setPositionMarker] = useState({latitude: 100, longitude: 200});
   const [placeMarkers, setPlaceMarkers] = useState([{position: {latitude: 100, longitude: 200}, berry: '', placeName: ''}]);
   const [coordinatesFromMap, setCoordinatesFromMap] = useState(false);
   const [userPosition, setUserPosition] = useState({latitude: 100, longitude: 200});
-  const [otsikko, setOtsikko] = useState('');
+  //const [markerText, setMarkerText] = useState('');
 
   
   //tuleekohan tästä joku varoitus kuitenkin
   currentMapPosition = {latitude: 0, longitude: 0};
-  console.log("map render");
-  
-  
+  //console.log("map render");
   
   if (route.params) {
     //console.log("params in map", route.params);
@@ -38,14 +38,10 @@ function Map ({navigation, route}) {
   }
   
   useEffect(() => {
-    //console.log("useEffect");
-    //coordinatesFromMap = false;
     getLocation();
   }, []);
 
-  useEffect(() => {
-
-  }, [placeMarkers])
+ 
   
   const getLocation = async() => {
     let { status} = await Location.requestPermissionsAsync();
@@ -104,10 +100,14 @@ function Map ({navigation, route}) {
   }
 
   const markerTesti = (marker) => {
-    setOtsikko(marker.title);
+    setMarkerText(`${marker.berry} ${marker.placeName} `);
+    //marker.showCallout();
+    /*<Marker
+  key={marker.id}
+  ref={ref => {
+  this.markers[marker.id] = ref;
+}}></Marker>*/
   }
-
-  
 
   return (
     <View style={styles.container}>
@@ -132,22 +132,23 @@ function Map ({navigation, route}) {
             latitude: positionMarker.latitude,
             longitude: positionMarker.longitude
           }}
-            title='You are here'
-        />
+          title='You are here'
+        >
+        </Marker>
         
         {placeMarkers.map((marker, index) => (
           <Marker
-          key={index}
-          coordinate={{
-            latitude: marker.position.latitude,
-            longitude: marker.position.longitude
-          }}
-          onPress={() => markerTesti(marker)}
-          title={otsikko}
-          
-          
-          />
-          ))}
+            key={index}
+            coordinate={{
+              latitude: marker.position.latitude,
+              longitude: marker.position.longitude
+            }}
+            title={`${marker.berry}`}
+            description={`${marker.placeName} ${marker.time}`}
+          >
+            
+          </Marker>
+        ))}
 
       </MapView>
       <View style={{position: 'absolute', alignSelf: 'center', justifyContent: 'flex-end'}}>

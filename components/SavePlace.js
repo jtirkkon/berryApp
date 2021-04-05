@@ -1,33 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Alert, ScrollView, Modal } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
 //import * as firebase from 'firebase';
 //Setting a timer for a long period of time, i.e. multiple minutes, is a performance and correctness issue on Android??? 
-import * as firebase from 'firebase';
 import { LogBox } from 'react-native';
 
-//import firebaseConfig from './Firebase'
+import { firebase } from './Firebase';
 
-import { Icon } from'react-native-elements';
-import testiContext from './Firebase';
 
-//Unmounted component: tulee vain silloin tällöin. Suosikeissa on yksi sivu tallennettuna. Tuleeko, jos esim. litres on tyhjä?
-//Setting timer?
-//aika inputti tänne.
+
+//import { Icon } from'react-native-elements';
+//import testiContext from './Firebase';
+
+
 
 function SavePlace ({navigation, route}) {
   LogBox.ignoreLogs(['Setting a timer']);
 
-  //Ainakin configin saa välitettyä
-  const {fireDB} = useContext(testiContext);
-  console.log(fireDB);
-  
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
   
-  const [selectedBerry, setSelectedBerry] = useState('');
+  const [selectedBerry, setSelectedBerry] = useState('bluberry');
   const [placeName, setPlaceName] = useState('');
   const [litres, setLitres] = useState('');
   const [date, setDate] = useState(time);
@@ -35,7 +30,7 @@ function SavePlace ({navigation, route}) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [otherSelection, setOtherSelection] = useState('Other');
 
-  const firebaseConfig = {
+  /*const firebaseConfig = {
     apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
     authDomain: "berryapp-e2c7e.firebaseapp.com",
     databaseURL: "https://berryapp-e2c7e-default-rtdb.europe-west1.firebasedatabase.app",
@@ -48,26 +43,22 @@ function SavePlace ({navigation, route}) {
   
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
+    console.log("Saveplace initiliaze");
    } else {
     firebase.app(); // if already initialized, use that one
-  }
+    console.log("SavePlace firebaseApp()")
+  }*/
   
   const {position} = route.params;
-  console.log("in save place pos.", position);
-  //Pitäiskö position tallettaa stateen?
-  //Vai tuleeko memoryleak siitä, jos ei valitse mitään marjaa?
-  
-  
-  //console.log(time);
-  
+ 
   const savePlace = () => {
-    fireDB.database().ref('data/').push(
+    setPlaceName('');
+    setLitres('');
+    setMemo('');    
+    firebase.database().ref('data/').push(
       {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': date, 'memo': memo}
     );
-    /*firebase.database().ref('data/').push(
-        {'berry': selectedBerry, 'placeName': placeName, 'litres': litres, 'position': position, 'time': date, 'memo': memo}
-      );*/
-
+      
     Alert.alert(
       'Data saved',
       '',
@@ -77,9 +68,7 @@ function SavePlace ({navigation, route}) {
         }
       ]
     );
-    setPlaceName('');
-    setLitres('');
-    setMemo('');    
+    //position = null;
   }
 
   const handlePickerValueChange = (value, index) => {
@@ -99,8 +88,7 @@ function SavePlace ({navigation, route}) {
     setSelectedBerry(otherSelection);
     setModalVisible(false);
   }
-
-  //Date inputti vielä
+ 
   return (
     <View style={styles.container}>
       <Header
@@ -113,8 +101,7 @@ function SavePlace ({navigation, route}) {
         <Picker
           selectedValue={selectedBerry}
           style={{ height: 50, width: 250, marginTop: 20, marginBottom: 20 }}
-          onValueChange={handlePickerValueChange}
-        >
+          onValueChange={handlePickerValueChange}>
           <Picker.Item label="Select berry" value="" />
           <Picker.Item label="Blueberry (mustikka)" value="blueberry" />
           <Picker.Item label="Lingonberry (puolukka)" value="lingonberry" />
@@ -124,6 +111,7 @@ function SavePlace ({navigation, route}) {
           <Picker.Item label="Sea-buckthorn (tyrni)" value="sea-buckthorn" />
           <Picker.Item label={otherSelection} value={otherSelection} />
         </Picker>
+        
         
         <Input label = 'Place name' onChangeText={text => setPlaceName(text)} value={placeName}/>
         <Input label = 'Litres' keyboardType = 'number-pad' onChangeText={text => setLitres(text)} value={litres}/>
@@ -174,89 +162,6 @@ const styles = StyleSheet.create({
   }
 });
 
-/*container: {
-  flex: 1,
-  backgroundColor: '#fff',
-  justifyContent: 'center',
-  alignItems: 'flex-start', 
-  paddingTop: 30
-},*/
-
 export default SavePlace;
 
   
-// These are user defined styles 
-/*const styles = StyleSheet.create({ 
-    screen: { 
-        flex: 1, 
-        alignItems: "center", 
-        justifyContent: "center", 
-        backgroundColor: "#fff", 
-    }, 
-    viewWrapper: { 
-        flex: 1, 
-        alignItems: "center", 
-        justifyContent: "center", 
-        backgroundColor: "rgba(0, 0, 0, 0.2)", 
-    }, 
-    modalView: { 
-        alignItems: "center", 
-        justifyContent: "center", 
-        position: "absolute", 
-        top: "50%", 
-        left: "50%", 
-        elevation: 5, 
-        transform: [{ translateX: -(width * 0.4) },  
-                    { translateY: -90 }], 
-        height: 180, 
-        width: width * 0.8, 
-        backgroundColor: "#fff", 
-        borderRadius: 7, 
-    }, 
-    textInput: { 
-        width: "80%", 
-        borderRadius: 5, 
-        paddingVertical: 8, 
-        paddingHorizontal: 16, 
-        borderColor: "rgba(0, 0, 0, 0.2)", 
-        borderWidth: 1, 
-        marginBottom: 8, 
-    }, 
-});*/
-
-/*
- Can't perform a React state update on an unmounted component. 
- This is a no-op, but it indicates a memory leak in your application. 
- To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
- 
- Tuli ainakin silloin, kun tulin takaisin show placesista ja tallensin, tuleekohan tämä vain yhden kerran. 
- Näin kävi myös toisen kerran.
- Kaikki valittu -> varoitus tuli
- - Ei valittu mitään -> varoitus tuli
- - Myös vaikka kävi välillä mapissa, niin varoitus tuli ainakin savea painamalla.
- - Tuli myös kartasta koordinaatit valitsemalla
- - Entä jos ei käy ollenkaan Berry placesissa? -> Silloin ei näyttäis tulevan
- - Berry Placesissa käyminen, sen jotenkin taitaa aiheuttaa...
- - Pitäis kokeilla saada firebase vain yhteen paikkaan -> tämä ekaksi!
-
- For me, clean the state in the unmount of the component helped.
-
- const [state, setState] = useState({});
-
-useEffect(() => {
-    myFunction();
-    return () => {
-      setState({}); // This worked for me
-    };
-}, []);
-
-const myFunction = () => {
-    setState({
-        name: 'Jhon',
-        surname: 'Doe',
-    })
-
-
-
-
-*/

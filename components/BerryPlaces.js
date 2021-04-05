@@ -3,19 +3,18 @@ import React, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, View, FlatList, Alert } from 'react-native';
 import { Header, Text, ListItem, Overlay } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
-import * as firebase from 'firebase';
-import testiContext from './Firebase';
+import { firebase } from './Firebase';
+import { LogBox } from 'react-native';
 
 
 function BerryPlaces ({navigation}) {
+  LogBox.ignoreLogs(['Setting a timer']);
   const [placeList, setPlaceList] = useState([]);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayText, setOverlayText] = useState({});
   //Tarviiko tätä?const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [temp, setTemp] = useState('black');
 
-  const {fireDB} = useContext(testiContext);
-  
   /*const firebaseConfig = {
     apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
     authDomain: "berryapp-e2c7e.firebaseapp.com",
@@ -27,22 +26,25 @@ function BerryPlaces ({navigation}) {
     measurementId: "G-HW99C0YXLW"
   };
 
-  firebase.app();
+  //firebase.app();
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
+    console.log("berryplaces initiliaze");
    } else {
     firebase.app(); // if already initialized, use that one
+    console.log("berryplace app()");
   }*/
 
   useEffect(() => {
+    //setPlaceList([]);
     getData();
   }, []);
 
+  
   const getData = () => {
-    fireDB.database().ref('data/').on('value', snapshot => {
-    //firebase.database().ref('data/').on('value', snapshot => {
+    firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
-      //console.log(data);
+      console.log("in getData", data);
       const tempArray = Object.entries(data);
       const dataArray = [];
       //console.log(Object.entries(data));
@@ -50,9 +52,9 @@ function BerryPlaces ({navigation}) {
         dataArray.push({berry: tempArray[i][1].berry,  placeName: tempArray[i][1].placeName, litres: tempArray[i][1].litres,  
         position: tempArray[i][1].position, time: tempArray[i][1].time, memo: tempArray[i][1].memo,  isSelected: false,  id: tempArray[i][0]});
       }
-      //console.log("dataArray:", dataArray);
+      
       setPlaceList(dataArray);
-    });  
+    });
   }
 
   const showData = (item) => {
@@ -74,7 +76,7 @@ function BerryPlaces ({navigation}) {
         },
         { 
           text: "OK", onPress: () => {
-            let productRef = fireDB.database().ref('data/' + id);
+            let productRef = firebase.database().ref('data/' + id);
             //let productRef = firebase.database().ref('data/' + id);
             productRef.remove();
           } 
@@ -88,12 +90,29 @@ function BerryPlaces ({navigation}) {
     let tempArr = placeList;
     tempArr[index].isSelected = !tempArr[index].isSelected;
     setPlaceList(tempArr);
-    //setSelectedPlaces(placeList.filter((item) => item.isSelected === true));
-    //Näillä kahdella renderöinnillä toimii, tutkitaan vielä pakkorenderöintiä
     
-    //Tätä tutkittava
+    //Tätä tutkittava?
     setTemp('green');
     setTemp('black');
+  }
+
+  const showSelected = () => {
+    console.log("show selected");
+    const placeSelected = placeList.find(item => item.isSelected === true);
+    if (placeSelected) {
+      navigation.navigate('Map', {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true});
+    } else {
+      Alert.alert(
+        'Select at least one place.',
+        '',
+        [
+          { 
+            text: "OK", onPress: () => {} 
+          }
+        ]
+      );
+    }
+    //, {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true})
   }
 
   //containerStyle={{width: 400}} Tällä sais leveämmäksi
@@ -117,20 +136,22 @@ function BerryPlaces ({navigation}) {
     </ListItem>
   );
 
+  
+
   return (
     <View style={styles.container}>
       <Header
         leftComponent = {<Text h4 onPress = {() => navigation.navigate('Map')}>Map</Text>}
-        centerComponent={<Text h4 onPress = {() => 
-        navigation.navigate('Map', {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true})}>Show selected</Text>}
+        centerComponent={<Text h4 onPress = {showSelected}>Show selected</Text>}
         rightComponent = {<Text h4 onPress = {() => navigation.navigate('Help')}>Help</Text>}
       />
+      
+      <StatusBar style="auto" />
       <FlatList 
         data={placeList}
         keyExtractor={(item, index) => index.toString()} 
         renderItem={renderItem} 
       />
-      <StatusBar style="auto" />
 
        <Overlay isVisible={overlayVisible} onBackdropPress={() => setOverlayVisible(false)}>
         <View >
