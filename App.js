@@ -6,14 +6,14 @@ import SavePlace from './components/SavePlace';
 import BerryPlaces from './components/BerryPlaces';
 import Help from './components/Help';
 
-//Bugit:  - Markkerin päivitys
-//Emulaattorin kokeilu
+//Bugit:  
+//- Markkerin päivitys
+//- Kokeillaanko marjojen kuvia johonkin, markkeriin?
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
-
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Map" component={Map} />
@@ -22,6 +22,5 @@ export default function App() {
         <Stack.Screen name="Help" component={Help} />
       </Stack.Navigator>
     </NavigationContainer>
-   
   );
 }

@@ -1,20 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, View, Alert, ScrollView, Modal } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
-//import * as firebase from 'firebase';
-//Setting a timer for a long period of time, i.e. multiple minutes, is a performance and correctness issue on Android??? 
 import { LogBox } from 'react-native';
 
 import { firebase } from './Firebase';
-
-
-
-//import { Icon } from'react-native-elements';
-//import testiContext from './Firebase';
-
-
 
 function SavePlace ({navigation, route}) {
   LogBox.ignoreLogs(['Setting a timer']);
@@ -22,7 +13,7 @@ function SavePlace ({navigation, route}) {
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
   
-  const [selectedBerry, setSelectedBerry] = useState('bluberry');
+  const [selectedBerry, setSelectedBerry] = useState('');
   const [placeName, setPlaceName] = useState('');
   const [litres, setLitres] = useState('');
   const [date, setDate] = useState(time);
@@ -68,14 +59,10 @@ function SavePlace ({navigation, route}) {
         }
       ]
     );
-    //position = null;
   }
 
   const handlePickerValueChange = (value, index) => {
-    //console.log("handle", value);
-    //console.log("index", index);
     if (index === 7) {
-      //console.log("other");
       setOtherSelection('');
       setModalVisible(true);
     } else {
@@ -111,7 +98,6 @@ function SavePlace ({navigation, route}) {
           <Picker.Item label="Sea-buckthorn (tyrni)" value="sea-buckthorn" />
           <Picker.Item label={otherSelection} value={otherSelection} />
         </Picker>
-        
         
         <Input label = 'Place name' onChangeText={text => setPlaceName(text)} value={placeName}/>
         <Input label = 'Litres' keyboardType = 'number-pad' onChangeText={text => setLitres(text)} value={litres}/>
@@ -154,7 +140,6 @@ const styles = StyleSheet.create({
   modalStyle: {
     alignItems: "center", 
     justifyContent: "center", 
-    //position: "absolute", 
     height: 250, 
     width: 300, 
     backgroundColor: "#fff", 

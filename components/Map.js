@@ -1,38 +1,43 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Alert} from 'react-native';
-import MapView, { Callout, Marker} from'react-native-maps';
+import MapView, {Marker, Callout} from'react-native-maps';
 import * as Location from 'expo-location';
 import { Header } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
 import { LogBox } from 'react-native';
-
-//Bugit: Markkerin tiedot ei päivity
-//Koordinaatit on/of testaus
+//import { useRef } from 'react';
 
 function Map ({navigation, route}) {
   LogBox.ignoreLogs(['Setting a timer']);
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
-  //const [currentMapPosition, setCurrentMapPosition] = useState({latitude: 60.17, longitude: 24.94});
   const [positionMarker, setPositionMarker] = useState({latitude: 100, longitude: 200});
   const [placeMarkers, setPlaceMarkers] = useState([{position: {latitude: 100, longitude: 200}, berry: '', placeName: ''}]);
   const [coordinatesFromMap, setCoordinatesFromMap] = useState(false);
-  const [userPosition, setUserPosition] = useState({latitude: 100, longitude: 200});
+  const [userPosition, setUserPosition] = useState({latitude: 0, longitude: 0});
+  //100 ja 200
   //const [markerText, setMarkerText] = useState('');
 
+  //??
+  //const markerRef = useRef();
+  //saattaa heittää välillä 0, 0:aan, onko silloin, jos ei ole katsonut yhtään paikkaa
+  //pois päältä ottaessa menee, jos ei liikuta ollenkaan karttaa, kun tulee show placeista
+  //Entä jos tämäkin olis state?
+  currentMapPosition = {latitude: 60.17, longitude: 37};
+
   
-  //tuleekohan tästä joku varoitus kuitenkin
-  currentMapPosition = {latitude: 0, longitude: 0};
-  //console.log("map render");
-  
+ 
   if (route.params) {
-    //console.log("params in map", route.params);
+    //console.log("Map: route.params", route.params);
     if (route.params.placePermission) {
       setPlaceMarkers(route.params.selectedBerryPlaces);
-      //console.log("placeMarkers", placeMarkers);
+      console.log("placeMarkers", placeMarkers);
+      markerRef.hideCallout();
       const placePosition = route.params.selectedBerryPlaces[0].position;
+      currentMapPosition = {latitude: placePosition.latitude,  longitude: placePosition.longitude};
       setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
+      console.log("placepositionLatitude", placePosition.latitude);
       route.params.placePermission = false;
     }
   }
@@ -41,8 +46,6 @@ function Map ({navigation, route}) {
     getLocation();
   }, []);
 
- 
-  
   const getLocation = async() => {
     let { status} = await Location.requestPermissionsAsync();
     if(status !== 'granted') {
@@ -62,8 +65,9 @@ function Map ({navigation, route}) {
   
   //Handles user's selection if coordinates are selected from the map
   const handleCoordinatesSelection = () => {
+    //marker.showCallout();
+    //markerRef.hideCallout();
     if (coordinatesFromMap === false) {
-      //console.log("if");
       setPosition(currentMapPosition);
       setCoordinatesFromMap(true);
       //console.log("handleCoordinatesSelection: coordinatesFromMap", coordinatesFromMap);
@@ -79,7 +83,6 @@ function Map ({navigation, route}) {
     } else {
       setCoordinatesFromMap(false);
       setPosition(currentMapPosition);
-      
     }
     console.log("handleCoordinatesSelection", coordinatesFromMap);
   }
@@ -97,16 +100,6 @@ function Map ({navigation, route}) {
       //console.log(event.nativeEvent.coordinate);
       navigation.navigate('Save new place', {position: event.nativeEvent.coordinate});
     }
-  }
-
-  const markerTesti = (marker) => {
-    setMarkerText(`${marker.berry} ${marker.placeName} `);
-    //marker.showCallout();
-    /*<Marker
-  key={marker.id}
-  ref={ref => {
-  this.markers[marker.id] = ref;
-}}></Marker>*/
   }
 
   return (
@@ -134,22 +127,24 @@ function Map ({navigation, route}) {
           }}
           title='You are here'
         >
+         
         </Marker>
-        
-        {placeMarkers.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: marker.position.latitude,
-              longitude: marker.position.longitude
-            }}
-            title={`${marker.berry}`}
-            description={`${marker.placeName} ${marker.time}`}
-          >
-            
+          {placeMarkers.map((marker, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: marker.position.latitude,
+                longitude: marker.position.longitude
+              }}
+              ref={ref => {
+                markerRef = ref;
+              }}
+              title={`${marker.berry}`}
+              description={`${marker.placeName} ${marker.time}`}
+            >
           </Marker>
         ))}
-
+        
       </MapView>
       <View style={{position: 'absolute', alignSelf: 'center', justifyContent: 'flex-end'}}>
      
@@ -164,6 +159,44 @@ function Map ({navigation, route}) {
   );          
 }
 
+//
+
+/*<Marker
+                pinColor="red"
+                ref={ref => {
+                  this.marker = ref;
+                }}
+                coordinate={coords}
+                title={title}
+                description={description}
+              >
+                {Platform.OS === "ios" ? (
+                  <Callout
+                    tooltip={true}
+                    style={styles.callout}
+                  >
+                    <Text style={styles.title}>
+											{title}
+                    </Text>
+                    <Text style={styles.description}>
+                      {description}
+                    </Text>
+                  </Callout>
+                ): null }
+</Marker>*/
+
+
+
+
+/*title={`${marker.berry}`}
+            description={`${marker.placeName} ${marker.time}`}*/
+
+            /*<Callout tooltip>
+            <View style={styles.callOutStyle}>
+              <Text style={styles.callOutTextStyle}>{marker.placeName}</Text>
+            </View>
+          </Callout>*/
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -176,6 +209,15 @@ const styles = StyleSheet.create({
     height: 300,
     width: 360
   },
+  callOutStyle: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff'
+  },
+  callOutTextStyle: {
+    fontSize: 16,
+    marginBottom: 5
+  }
 });
 
 export default Map;

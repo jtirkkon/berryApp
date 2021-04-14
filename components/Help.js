@@ -40,8 +40,8 @@ function Help() {
         </View>
         <Text style={{fontSize: 16, margin: 20}}><Text style={{fontWeight: 'bold'}}>Press</Text> the place item to see it on the map.</Text>
         <Text style={{fontSize: 16, marginRight: 20, marginLeft: 20, marginBottom: 20}}>You can select several places to 
-        <Text style={{fontWeight: 'bold'}}> long press</Text> the item. The color of information icon turns green. To see selected places, press
-        <Text style={{fontWeight: 'bold'}}> Show selected.</Text> The map navigates to location of first item.</Text>
+        <Text style={{fontWeight: 'bold'}}> long press</Text> the item. The color of information icon turns green. Unselect place to long press 
+        it again. To see selected places, press<Text style={{fontWeight: 'bold'}}> Show selected.</Text> The map navigates to location of first item.</Text>
       </ScrollView>
       <StatusBar style="auto" />
     </View>

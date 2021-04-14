@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, FlatList, Alert } from 'react-native';
 import { Header, Text, ListItem, Overlay } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
@@ -12,8 +12,7 @@ function BerryPlaces ({navigation}) {
   const [placeList, setPlaceList] = useState([]);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayText, setOverlayText] = useState({});
-  //Tarviiko tätä?const [selectedPlaces, setSelectedPlaces] = useState([]);
-  const [temp, setTemp] = useState('black');
+  const [temp, setTemp] = useState('');
 
   /*const firebaseConfig = {
     apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
@@ -36,29 +35,37 @@ function BerryPlaces ({navigation}) {
   }*/
 
   useEffect(() => {
-    //setPlaceList([]);
     getData();
   }, []);
 
   
   const getData = () => {
+    console.log("getData, dataArray,", dataArray);
+    console.log("getData, placeList", placeList);
+    let dataArray = [];
+    if (dataArray.length > 1) {
+      dataArray.length = 0;
+    }
     firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
-      console.log("in getData", data);
+      //console.log("in getData", data);
       const tempArray = Object.entries(data);
-      const dataArray = [];
       //console.log(Object.entries(data));
       for (let i = 0; i < tempArray.length; i++) {
         dataArray.push({berry: tempArray[i][1].berry,  placeName: tempArray[i][1].placeName, litres: tempArray[i][1].litres,  
         position: tempArray[i][1].position, time: tempArray[i][1].time, memo: tempArray[i][1].memo,  isSelected: false,  id: tempArray[i][0]});
       }
-      
       setPlaceList(dataArray);
     });
+    console.log("dataArray", dataArray);
+    //dataArray.length = 0;
+    //setPlaceList(dataArray);
+    //setTemp('temp');
+    //setTemp('');
+    //setPlaceList(dataArray);
   }
 
   const showData = (item) => {
-    //console.log("showData", item.placeName);
     setOverlayVisible(!overlayVisible);
     setOverlayText({berry: item.berry, placeName: item.placeName, litres: item.litres, time: item.time, memo: item.memo});
   }
@@ -77,13 +84,14 @@ function BerryPlaces ({navigation}) {
         { 
           text: "OK", onPress: () => {
             let productRef = firebase.database().ref('data/' + id);
-            //let productRef = firebase.database().ref('data/' + id);
             productRef.remove();
+            getData();
           } 
         }
       ]
     );
-    getData();
+    //setPlaceList([]);
+    
   }
 
   const selectBerryPlace = (index) => {
@@ -91,13 +99,14 @@ function BerryPlaces ({navigation}) {
     tempArr[index].isSelected = !tempArr[index].isSelected;
     setPlaceList(tempArr);
     
-    //Tätä tutkittava?
-    setTemp('green');
-    setTemp('black');
+    
+    //Tätä tutkittava?, pois ja kokeillaan
+    setTemp('temp');
+    setTemp('');
   }
 
   const showSelected = () => {
-    console.log("show selected");
+    //console.log("show selected");
     const placeSelected = placeList.find(item => item.isSelected === true);
     if (placeSelected) {
       navigation.navigate('Map', {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true});
@@ -112,10 +121,8 @@ function BerryPlaces ({navigation}) {
         ]
       );
     }
-    //, {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true})
   }
 
-  //containerStyle={{width: 400}} Tällä sais leveämmäksi
   renderItem = ({ item, index }) => (
     <ListItem bottomDivider onPress={() => 
     navigation.navigate('Map', {selectedBerryPlaces: [item], placePermission: true})}
@@ -132,11 +139,8 @@ function BerryPlaces ({navigation}) {
       <ListItem.Content>
         <Icon reverse name='trash-bin-outline' type='ionicon' color='red' onPress={() => deleteItem(item.placeName, item.id)}/>
       </ListItem.Content>
-      
     </ListItem>
   );
-
-  
 
   return (
     <View style={styles.container}>
@@ -153,7 +157,7 @@ function BerryPlaces ({navigation}) {
         renderItem={renderItem} 
       />
 
-       <Overlay isVisible={overlayVisible} onBackdropPress={() => setOverlayVisible(false)}>
+      <Overlay isVisible={overlayVisible} onBackdropPress={() => setOverlayVisible(false)}>
         <View >
           <Text style={styles.overlayTextStyle}>{overlayText.berry}, {overlayText.litres} litres</Text>
           <Text style={styles.overlayTextStyle}>{overlayText.placeName}, {overlayText.time}</Text>
@@ -168,9 +172,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    //justifyContent: 'center',
-    //alignItems: 'center', 
-    //paddingTop: 30
   },
   overlayTextStyle: {
     fontSize: 24,
