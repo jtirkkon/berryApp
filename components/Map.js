@@ -1,43 +1,41 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Alert} from 'react-native';
-import MapView, {Marker, Callout} from'react-native-maps';
+import MapView, {Marker} from'react-native-maps';
 import * as Location from 'expo-location';
 import { Header } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
 import { LogBox } from 'react-native';
-//import { useRef } from 'react';
+
+//Locationiin on laitettava tarkennus -> latitudedelta ja longitude
 
 function Map ({navigation, route}) {
   LogBox.ignoreLogs(['Setting a timer']);
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
+  const [latitudeDelta, setLatitudeDelta] = useState(0.0032);
+  const [longitudeDelta, setLongitudeDelta] = useState(0.0021);
   const [positionMarker, setPositionMarker] = useState({latitude: 100, longitude: 200});
   const [placeMarkers, setPlaceMarkers] = useState([{position: {latitude: 100, longitude: 200}, berry: '', placeName: ''}]);
   const [coordinatesFromMap, setCoordinatesFromMap] = useState(false);
   const [userPosition, setUserPosition] = useState({latitude: 0, longitude: 0});
-  //100 ja 200
-  //const [markerText, setMarkerText] = useState('');
-
-  //??
-  //const markerRef = useRef();
-  //saattaa heittää välillä 0, 0:aan, onko silloin, jos ei ole katsonut yhtään paikkaa
-  //pois päältä ottaessa menee, jos ei liikuta ollenkaan karttaa, kun tulee show placeista
-  //Entä jos tämäkin olis state?
-  currentMapPosition = {latitude: 60.17, longitude: 37};
-
-  
+  const [currentMapPosition, setCurrentMapPosition] = useState({latitude: 0, longitude: 0});
  
+  //currentMapPositionTemp = {latitude: 60, longitude: 36};
+
   if (route.params) {
     //console.log("Map: route.params", route.params);
     if (route.params.placePermission) {
       setPlaceMarkers(route.params.selectedBerryPlaces);
-      console.log("placeMarkers", placeMarkers);
+      //console.log("placeMarkers", placeMarkers);
       markerRef.hideCallout();
       const placePosition = route.params.selectedBerryPlaces[0].position;
-      currentMapPosition = {latitude: placePosition.latitude,  longitude: placePosition.longitude};
+      //currentMapPosition = {latitude: placePosition.latitude,  longitude: placePosition.longitude};
+      //setCurrentMapPosition({latitude: placePosition.latitude,  longitude: placePosition.longitude});
       setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
-      console.log("placepositionLatitude", placePosition.latitude);
+      setLatitudeDelta(0.0032);
+      setLongitudeDelta(0.0021);
+      //console.log("placepositionLatitude", placePosition.latitude);
       route.params.placePermission = false;
     }
   }
@@ -60,17 +58,17 @@ function Map ({navigation, route}) {
   }
 
   const updateMapPosition = (region) => {
-    currentMapPosition = {latitude: region.latitude, longitude: region.longitude};
+    setCurrentMapPosition({latitude: region.latitude, longitude: region.longitude});
+    setLatitudeDelta(region.latitudeDelta);
+    setLongitudeDelta(region.longitudeDelta);
+    setPosition({latitude: region.latitude, longitude: region.longitude});
   }
   
   //Handles user's selection if coordinates are selected from the map
   const handleCoordinatesSelection = () => {
-    //marker.showCallout();
-    //markerRef.hideCallout();
     if (coordinatesFromMap === false) {
       setPosition(currentMapPosition);
-      setCoordinatesFromMap(true);
-      //console.log("handleCoordinatesSelection: coordinatesFromMap", coordinatesFromMap);
+      setCoordinatesFromMap(true);  
       Alert.alert(
         'You can select a location by clicking on the map.',
         '',
@@ -81,10 +79,18 @@ function Map ({navigation, route}) {
         ]
       );
     } else {
-      setCoordinatesFromMap(false);
       setPosition(currentMapPosition);
+      setCoordinatesFromMap(false);
+      Alert.alert(
+        'Select a location from map: OFF',
+        '',
+        [
+          { 
+            text: "OK", onPress: () => {} 
+          }
+        ]
+      );
     }
-    console.log("handleCoordinatesSelection", coordinatesFromMap);
   }
 
   //Function is executed if user save his own position coordinates
@@ -95,7 +101,7 @@ function Map ({navigation, route}) {
   //Function is executed if user select coordinates by clickng on the map
   const selectPlaceFromMap = (event) => {
     //console.log(event.nativeEvent.coordinate);
-    console.log("SelectPlaceFromMap: coordinatesFromMap", coordinatesFromMap);
+    //console.log("SelectPlaceFromMap: coordinatesFromMap", coordinatesFromMap);
     if (coordinatesFromMap) {
       //console.log(event.nativeEvent.coordinate);
       navigation.navigate('Save new place', {position: event.nativeEvent.coordinate});
@@ -117,8 +123,8 @@ function Map ({navigation, route}) {
         region={{
           latitude: position.latitude,
           longitude: position.longitude,
-          latitudeDelta:0.0032,
-          longitudeDelta:0.0021,
+          latitudeDelta: latitudeDelta,
+          longitudeDelta: longitudeDelta,
         }}>      
         <Marker
           coordinate={{
