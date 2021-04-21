@@ -17,14 +17,3 @@ if (!firebase.apps.length) {
 
 export { firebase };
 
-//function Firebase () {
-  /*if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  } else {
-    firebase.app(); // if already initialized, use that one
-  }*/
- /* app.initializeApp(firebaseConfig);
-}
-
-export default Firebase;*/
-

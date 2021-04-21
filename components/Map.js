@@ -8,10 +8,9 @@ import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
 import { LogBox } from 'react-native';
 
-//Locationiin on laitettava tarkennus -> latitudedelta ja longitude
-
 function Map ({navigation, route}) {
   LogBox.ignoreLogs(['Setting a timer']);
+  
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
   const [latitudeDelta, setLatitudeDelta] = useState(0.0032);
   const [longitudeDelta, setLongitudeDelta] = useState(0.0021);
@@ -21,21 +20,14 @@ function Map ({navigation, route}) {
   const [userPosition, setUserPosition] = useState({latitude: 0, longitude: 0});
   const [currentMapPosition, setCurrentMapPosition] = useState({latitude: 0, longitude: 0});
  
-  //currentMapPositionTemp = {latitude: 60, longitude: 36};
-
   if (route.params) {
-    //console.log("Map: route.params", route.params);
     if (route.params.placePermission) {
       setPlaceMarkers(route.params.selectedBerryPlaces);
-      //console.log("placeMarkers", placeMarkers);
       markerRef.hideCallout();
       const placePosition = route.params.selectedBerryPlaces[0].position;
-      //currentMapPosition = {latitude: placePosition.latitude,  longitude: placePosition.longitude};
-      //setCurrentMapPosition({latitude: placePosition.latitude,  longitude: placePosition.longitude});
       setPosition({latitude: placePosition.latitude, longitude: placePosition.longitude});
       setLatitudeDelta(0.0032);
       setLongitudeDelta(0.0021);
-      //console.log("placepositionLatitude", placePosition.latitude);
       route.params.placePermission = false;
     }
   }
@@ -52,6 +44,8 @@ function Map ({navigation, route}) {
     else {
       let location = await Location.getCurrentPositionAsync({});
       setPosition({latitude: location.coords.latitude, longitude: location.coords.longitude});
+      setLatitudeDelta(0.0032);
+      setLongitudeDelta(0.0021);
       setUserPosition({latitude: location.coords.latitude, longitude: location.coords.longitude});
       setPositionMarker({latitude: location.coords.latitude, longitude: location.coords.longitude});
     }
@@ -100,10 +94,7 @@ function Map ({navigation, route}) {
 
   //Function is executed if user select coordinates by clickng on the map
   const selectPlaceFromMap = (event) => {
-    //console.log(event.nativeEvent.coordinate);
-    //console.log("SelectPlaceFromMap: coordinatesFromMap", coordinatesFromMap);
     if (coordinatesFromMap) {
-      //console.log(event.nativeEvent.coordinate);
       navigation.navigate('Save new place', {position: event.nativeEvent.coordinate});
     }
   }
@@ -125,7 +116,8 @@ function Map ({navigation, route}) {
           longitude: position.longitude,
           latitudeDelta: latitudeDelta,
           longitudeDelta: longitudeDelta,
-        }}>      
+        }}
+      >      
         <Marker
           coordinate={{
             latitude: positionMarker.latitude,
@@ -133,7 +125,6 @@ function Map ({navigation, route}) {
           }}
           title='You are here'
         >
-         
         </Marker>
           {placeMarkers.map((marker, index) => (
             <Marker
@@ -160,48 +151,9 @@ function Map ({navigation, route}) {
       <Icon reverse name='locate-outline' type='ionicon' color='#0000FF' onPress={getLocation}/>
         </View>  
         <StatusBar style="auto" />
-      
     </View>
   );          
 }
-
-//
-
-/*<Marker
-                pinColor="red"
-                ref={ref => {
-                  this.marker = ref;
-                }}
-                coordinate={coords}
-                title={title}
-                description={description}
-              >
-                {Platform.OS === "ios" ? (
-                  <Callout
-                    tooltip={true}
-                    style={styles.callout}
-                  >
-                    <Text style={styles.title}>
-											{title}
-                    </Text>
-                    <Text style={styles.description}>
-                      {description}
-                    </Text>
-                  </Callout>
-                ): null }
-</Marker>*/
-
-
-
-
-/*title={`${marker.berry}`}
-            description={`${marker.placeName} ${marker.time}`}*/
-
-            /*<Callout tooltip>
-            <View style={styles.callOutStyle}>
-              <Text style={styles.callOutTextStyle}>{marker.placeName}</Text>
-            </View>
-          </Callout>*/
 
 const styles = StyleSheet.create({
   container: {

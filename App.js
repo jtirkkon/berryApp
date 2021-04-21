@@ -6,10 +6,6 @@ import SavePlace from './components/SavePlace';
 import BerryPlaces from './components/BerryPlaces';
 import Help from './components/Help';
 
-//Bugit:  
-//- Markkerin päivitys
-//- Kokeillaanko marjojen kuvia johonkin, markkeriin?
-
 const Stack = createStackNavigator();
 
 export default function App() {

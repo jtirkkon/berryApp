@@ -1,8 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import { StyleSheet, View, ScrollView} from 'react-native';
-import { Header } from 'react-native-elements';
-import { Button } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
 
@@ -52,12 +50,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    //alignItems: 'flex-start',
-    //justifyContent: 'center',
   },
   textStyle: {
     fontSize: 16,
   }
 });
 
-  export default Help;
+export default Help;

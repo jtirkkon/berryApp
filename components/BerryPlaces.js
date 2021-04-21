@@ -6,7 +6,6 @@ import { Icon } from 'react-native-elements';
 import { firebase } from './Firebase';
 import { LogBox } from 'react-native';
 
-
 function BerryPlaces ({navigation}) {
   LogBox.ignoreLogs(['Setting a timer']);
   const [placeList, setPlaceList] = useState([]);
@@ -14,55 +13,35 @@ function BerryPlaces ({navigation}) {
   const [overlayText, setOverlayText] = useState({});
   const [temp, setTemp] = useState('');
 
-  /*const firebaseConfig = {
-    apiKey: "AIzaSyDBF6hUqAFBWAGHqJABwnj8uu7K-iUykD8",
-    authDomain: "berryapp-e2c7e.firebaseapp.com",
-    databaseURL: "https://berryapp-e2c7e-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "berryapp-e2c7e",
-    storageBucket: "berryapp-e2c7e.appspot.com",
-    messagingSenderId: "3982672749",
-    appId: "1:3982672749:web:74a9232db469ea2ab61064",
-    measurementId: "G-HW99C0YXLW"
-  };
-
-  //firebase.app();
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-    console.log("berryplaces initiliaze");
-   } else {
-    firebase.app(); // if already initialized, use that one
-    console.log("berryplace app()");
-  }*/
-
   useEffect(() => {
     getData();
+    
+    return () => {
+      firebase.database().ref('data/').off('value');
+    };
   }, []);
+
+  const testi = () => {
+    console.log("logoff");
+  }
 
   
   const getData = () => {
-    console.log("getData, dataArray,", dataArray);
-    console.log("getData, placeList", placeList);
     let dataArray = [];
-    if (dataArray.length > 1) {
-      dataArray.length = 0;
-    }
+    
     firebase.database().ref('data/').on('value', snapshot => {
       const data = snapshot.val();
-      //console.log("in getData", data);
-      const tempArray = Object.entries(data);
-      //console.log(Object.entries(data));
-      for (let i = 0; i < tempArray.length; i++) {
-        dataArray.push({berry: tempArray[i][1].berry,  placeName: tempArray[i][1].placeName, litres: tempArray[i][1].litres,  
-        position: tempArray[i][1].position, time: tempArray[i][1].time, memo: tempArray[i][1].memo,  isSelected: false,  id: tempArray[i][0]});
+      if (data) {
+        let tempArray = Object.entries(data);
+        for (let i = 0; i < tempArray.length; i++) {
+          dataArray.push({berry: tempArray[i][1].berry,  placeName: tempArray[i][1].placeName, litres: tempArray[i][1].litres,  
+          position: tempArray[i][1].position, time: tempArray[i][1].time, memo: tempArray[i][1].memo,  isSelected: false,  id: tempArray[i][0]});
+        }
+          setPlaceList(dataArray);
+        } else {
+        setPlaceList([]);
       }
-      setPlaceList(dataArray);
     });
-    console.log("dataArray", dataArray);
-    //dataArray.length = 0;
-    //setPlaceList(dataArray);
-    //setTemp('temp');
-    //setTemp('');
-    //setPlaceList(dataArray);
   }
 
   const showData = (item) => {
@@ -71,7 +50,6 @@ function BerryPlaces ({navigation}) {
   }
 
   const deleteItem = (placeName, id) => {
-    //console.log("deleteItem", id);
     Alert.alert(
       `Delete ${placeName}?`,
       '',
@@ -90,8 +68,6 @@ function BerryPlaces ({navigation}) {
         }
       ]
     );
-    //setPlaceList([]);
-    
   }
 
   const selectBerryPlace = (index) => {
@@ -99,14 +75,12 @@ function BerryPlaces ({navigation}) {
     tempArr[index].isSelected = !tempArr[index].isSelected;
     setPlaceList(tempArr);
     
-    
-    //Tätä tutkittava?, pois ja kokeillaan
+    //Iconin väri ei päivity ilman näitä?
     setTemp('temp');
     setTemp('');
   }
 
   const showSelected = () => {
-    //console.log("show selected");
     const placeSelected = placeList.find(item => item.isSelected === true);
     if (placeSelected) {
       navigation.navigate('Map', {selectedBerryPlaces: placeList.filter((item) => item.isSelected === true), placePermission: true});
