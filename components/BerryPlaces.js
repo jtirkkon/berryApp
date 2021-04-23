@@ -8,6 +8,7 @@ import { LogBox } from 'react-native';
 
 function BerryPlaces ({navigation}) {
   LogBox.ignoreLogs(['Setting a timer']);
+  
   const [placeList, setPlaceList] = useState([]);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [overlayText, setOverlayText] = useState({});
@@ -21,11 +22,6 @@ function BerryPlaces ({navigation}) {
     };
   }, []);
 
-  const testi = () => {
-    console.log("logoff");
-  }
-
-  
   const getData = () => {
     let dataArray = [];
     
@@ -39,8 +35,8 @@ function BerryPlaces ({navigation}) {
         }
           setPlaceList(dataArray);
         } else {
-        setPlaceList([]);
-      }
+          setPlaceList([]);
+        }
     });
   }
 
