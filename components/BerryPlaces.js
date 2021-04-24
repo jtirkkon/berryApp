@@ -69,7 +69,8 @@ function BerryPlaces ({navigation}) {
     tempArr[index].isSelected = !tempArr[index].isSelected;
     setPlaceList(tempArr);
     
-    //i-Iconin väri ei päivity ilman näitä?
+    //Tässä piti käyttää ylimääräistä statea, jotta i-Iconin värin sai päivittymään paikkaa valitessa?
+    //En keksinyt tähän syytä, miksi näin on tai miten tämän olisi saanut järkevämmin tehtyä.
     setTemp('temp');
     setTemp('');
   }
