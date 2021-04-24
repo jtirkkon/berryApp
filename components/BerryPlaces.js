@@ -69,7 +69,7 @@ function BerryPlaces ({navigation}) {
     tempArr[index].isSelected = !tempArr[index].isSelected;
     setPlaceList(tempArr);
     
-    //Iconin väri ei päivity ilman näitä?
+    //i-Iconin väri ei päivity ilman näitä?
     setTemp('temp');
     setTemp('');
   }
