@@ -6,11 +6,9 @@ import * as Location from 'expo-location';
 import { Header } from 'react-native-elements';
 import { Text } from 'react-native-elements';
 import{ Icon } from'react-native-elements';
-import { LogBox } from 'react-native';
 
 function Map ({navigation, route}) {
-  LogBox.ignoreLogs(['Setting a timer']);
-  
+ 
   const [position, setPosition] = useState({latitude: 60.17, longitude: 24.94});
   const [latitudeDelta, setLatitudeDelta] = useState(0.0032);
   const [longitudeDelta, setLongitudeDelta] = useState(0.0021);

@@ -4,10 +4,8 @@ import { StyleSheet, View, FlatList, Alert } from 'react-native';
 import { Header, Text, ListItem, Overlay } from 'react-native-elements';
 import { Icon } from 'react-native-elements';
 import { firebase } from './Firebase';
-import { LogBox } from 'react-native';
 
 function BerryPlaces ({navigation}) {
-  LogBox.ignoreLogs(['Setting a timer']);
   
   const [placeList, setPlaceList] = useState([]);
   const [overlayVisible, setOverlayVisible] = useState(false);

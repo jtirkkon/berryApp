@@ -3,13 +3,11 @@ import React, {useState} from 'react';
 import { StyleSheet, View, Alert, ScrollView, Modal } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { Header, Text, Button, Input } from 'react-native-elements';
-import { LogBox } from 'react-native';
 
 import { firebase } from './Firebase';
 
 function SavePlace ({navigation, route}) {
-  LogBox.ignoreLogs(['Setting a timer']);
-
+ 
   let currentTime = new Date();
   const time = `${currentTime.getDate()}.${currentTime.getMonth() + 1}.${currentTime.getFullYear()}`;
   
